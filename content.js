@@ -1,6 +1,7 @@
 (() => {
   "use strict";
 
+  const DEFAULTS = { enabled: true, hidePromoted: true, font: "inter" };
   const UI = "data-quiet-x-ui";
   const FIXTURE_PORT = "8765";
 
@@ -38,6 +39,7 @@
   let currentPath = null;
   let routePoll = 0;
   let toneTimer = 0;
+  let hooked = false;
 
   function allowedHost() {
     const host = location.hostname;
@@ -54,6 +56,46 @@
       return true;
     }
     return false;
+  }
+
+  function storageGet(defaults, done) {
+    try {
+      if (!chrome?.storage?.local) {
+        done(defaults);
+        return;
+      }
+      chrome.storage.local.get(defaults, (data) => {
+        if (chrome.runtime?.lastError) done(defaults);
+        else done({ ...defaults, ...data });
+      });
+    } catch {
+      done(defaults);
+    }
+  }
+
+  function hookRuntime() {
+    if (hooked) return;
+    hooked = true;
+    try {
+      chrome.runtime?.onMessage.addListener((message) => {
+        if (message?.type === "qx-route" && running) scan();
+      });
+      chrome.storage?.onChanged.addListener((changes, area) => {
+        if (area !== "local") return;
+        if (!changes.enabled && !changes.font && !changes.hidePromoted) return;
+        storageGet(DEFAULTS, applySettings);
+      });
+    } catch {
+      /* opened outside the extension */
+    }
+  }
+
+  function applySettings(data) {
+    const root = document.documentElement;
+    root.dataset.qxFont = data.font === "system" ? "system" : "inter";
+    root.dataset.qxPromoted = data.hidePromoted === false ? "show" : "hide";
+    if (data.enabled === false) stop();
+    else start();
   }
 
 function installFonts() {
@@ -748,7 +790,9 @@ function init() {
   if (!allowedHost()) return;
   document.documentElement.classList.add("quiet-x");
   document.documentElement.dataset.qxBoot = "1";
-  start();
+  hookRuntime();
+  applySettings(DEFAULTS);
+  storageGet(DEFAULTS, applySettings);
 }
 
   init();
