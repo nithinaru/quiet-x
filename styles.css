@@ -434,7 +434,6 @@ html.quiet-x .qx-sep {
   font-size: var(--qx-meta-size);
   line-height: 1.4;
   cursor: pointer;
-  text-transform: lowercase;
 }
 
 html.quiet-x .qx-sep {
