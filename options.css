@@ -1,0 +1,74 @@
+@font-face {
+  font-family: "Inter";
+  src: url("fonts/inter-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("fonts/inter-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("fonts/inter-600.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+body.qx-options {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--qx-bg);
+  color: var(--qx-fg);
+  font-family: var(--qx-font);
+  font-size: 16px;
+}
+
+body.qx-options main {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 64px 24px;
+}
+
+body.qx-options h1 {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+body.qx-options .lede,
+body.qx-options .note {
+  color: var(--qx-muted);
+  margin: 0 0 28px;
+}
+
+body.qx-options .note {
+  margin-top: 28px;
+  font-size: 14px;
+}
+
+body.qx-options .row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  text-transform: lowercase;
+}
+
+body.qx-options select,
+body.qx-options input {
+  accent-color: #fff;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--qx-hairline);
+}

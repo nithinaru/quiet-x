@@ -3,6 +3,11 @@
   "name": "quiet-x",
   "version": "0.1.0",
   "description": "Restyle X into a minimal, text-only, black-and-white reading view.",
+  "permissions": ["storage"],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
   "content_scripts": [
     {
       "matches": [

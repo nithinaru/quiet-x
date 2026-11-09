@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>quiet-x</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body class="qx-options">
+    <main>
+      <h1>quiet-x</h1>
+      <p class="lede">a text-only reading view for x.</p>
+      <label class="row">
+        <input id="enabled" type="checkbox" checked />
+        <span>enabled</span>
+      </label>
+      <label class="row">
+        <input id="hidePromoted" type="checkbox" checked />
+        <span>hide promoted posts</span>
+      </label>
+      <label class="row">
+        <span>typeface</span>
+        <select id="font">
+          <option value="inter">inter</option>
+          <option value="system">system</option>
+        </select>
+      </label>
+      <p class="note">the toolbar icon toggles quiet-x without opening this page.</p>
+    </main>
+    <script src="options.js"></script>
+  </body>
+</html>
