@@ -159,6 +159,7 @@
       node.classList.remove("qx-shell", "qx-composer");
     });
     document.getElementById("qx-fonts")?.remove();
+    globalThis.quietXPalette?.clear();
   }
 
   function scheduleScan() {
@@ -177,6 +178,7 @@
       if (routeChanged) {
         currentPath = location.pathname;
         document.documentElement.dataset.qxStatus = isStatusRoute() ? "1" : "0";
+        document.documentElement.dataset.qxPage = pageKind(location.pathname);
         window.clearInterval(toneTimer);
         toneTimer = 0;
         document.querySelectorAll(`[${UI}]`).forEach((node) => node.remove());
@@ -184,6 +186,7 @@
           article.removeAttribute("data-qx");
         });
       }
+      globalThis.quietXPalette?.sync();
       centerShell();
       renderNav();
       refreshCounts();
@@ -202,6 +205,23 @@
 
   function isStatusRoute() {
     return /\/status\/\d+/.test(location.pathname);
+  }
+
+  // Coarse page type for page-specific rules in pages.css.
+  function pageKind(path) {
+    if (/\/status\/\d+/.test(path)) return "status";
+    if (path === "/" || path === "/home") return "home";
+    if (path.startsWith("/explore")) return "explore";
+    if (path.startsWith("/search")) return "search";
+    if (path.startsWith("/notifications")) return "notifications";
+    if (path.startsWith("/messages") || path.startsWith("/i/chat")) return "chat";
+    if (path.startsWith("/settings")) return "settings";
+    if (path.startsWith("/i/bookmarks")) return "bookmarks";
+    if (path.startsWith("/i/lists") || /^\/[^/]+\/lists/.test(path)) return "lists";
+    if (/^\/[^/]+(\/(with_replies|media|likes|highlights|articles|superfollows))?\/?$/.test(path)) {
+      return "profile";
+    }
+    return "other";
   }
 
   function centerShell() {
