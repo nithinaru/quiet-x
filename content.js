@@ -125,6 +125,7 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
       hideHomeComposer();
       if (document.querySelector("[data-testid='primaryColumn']")) ensureBack();
       for (const article of articles()) transformArticle(article);
+      if (isStatusRoute()) transformComposer(document.querySelector("[data-testid='primaryColumn']"));
       if (document.readyState !== "loading") {
         document.documentElement.dataset.qxReady = "1";
       }
@@ -410,6 +411,8 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
     const actions = buildActions(article, true);
     actions.setAttribute("data-qx-detail-actions", "");
     bar.append(actions);
+    const tools = buildTools(article);
+    if (tools) bar.append(tools);
     clipGroup(article);
     insertBeforeGroup(article, bar);
   }
@@ -678,6 +681,41 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
       else history.back();
     });
     primary.insertBefore(back, primary.firstChild);
+  }
+
+  function transformComposer(primary) {
+    if (!primary) return;
+    const box = primary.querySelector('[data-testid="tweetTextarea_0"]');
+    if (!box) return;
+    const shell = box.closest('[data-testid="tweetComposer"]') || box.parentElement;
+    if (!shell || shell.getAttribute("data-testid") === "primaryColumn") return;
+    shell.classList.add("qx-composer");
+    if (!shell.querySelector(".qx-prompt")) {
+      const prompt = document.createElement("div");
+      prompt.className = "qx-prompt";
+      prompt.setAttribute(UI, "");
+      prompt.textContent = "> post your reply";
+      const send = document.createElement("button");
+      send.type = "button";
+      send.className = "qx-send";
+      send.setAttribute(UI, "");
+      send.textContent = "reply";
+      send.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        primary.querySelector('[data-testid="tweetButton"], [data-testid="tweetButtonInline"]')?.click();
+      });
+      shell.append(prompt, send);
+      const sync = () => {
+        const empty = !(box.textContent || "").trim();
+        prompt.hidden = !empty;
+        box.classList.toggle("is-empty", empty);
+      };
+      box.addEventListener("input", sync);
+      sync();
+    }
+    primary.querySelector('[data-testid="toolBar"]')?.classList.add("qx-clip");
+    primary.querySelector('[data-testid="tweetButton"], [data-testid="tweetButtonInline"]')?.classList.add("qx-clip");
   }
 
 function init() {

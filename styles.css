@@ -443,6 +443,47 @@ html.quiet-x .qx-tools {
   margin-left: auto;
 }
 
+html.quiet-x .qx-composer {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  position: relative !important;
+  margin-top: 8px !important;
+  padding: 18px 0 10px !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+
+html.quiet-x .qx-composer [data-testid="tweetTextarea_0"] {
+  flex: 1 1 auto;
+  min-height: 1.4em;
+  background: transparent !important;
+  border: 0 !important;
+  outline: none !important;
+  color: var(--qx-fg) !important;
+  font: inherit !important;
+  font-size: var(--qx-body-size) !important;
+}
+
+html.quiet-x .qx-composer [data-testid="tweetTextarea_0"].is-empty {
+  color: transparent !important;
+  caret-color: var(--qx-fg);
+}
+
+html.quiet-x .qx-prompt {
+  position: absolute;
+  left: 0;
+  color: var(--qx-muted);
+  font-size: var(--qx-body-size);
+  pointer-events: none;
+}
+
+html.quiet-x .qx-send {
+  color: var(--qx-muted);
+  font-size: var(--qx-body-size);
+}
+
 html.quiet-x [data-testid="showReplies"] {
   background: transparent !important;
   border: 0 !important;
