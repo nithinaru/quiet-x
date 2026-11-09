@@ -253,6 +253,115 @@ html.quiet-x [role="tab"][aria-selected="true"] {
   box-shadow: inset 0 -1px 0 #fff !important;
 }
 
+html.quiet-x article[data-testid="tweet"] {
+  position: relative;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding-top: var(--qx-post-pad-y) !important;
+  padding-bottom: var(--qx-post-pad-y) !important;
+}
+
+html.quiet-x article[data-testid="tweet"]:hover {
+  background: transparent !important;
+}
+
+html.quiet-x [data-testid="cellInnerDiv"] {
+  border: 0 !important;
+}
+
+html.quiet-x [data-testid="Tweet-User-Avatar"],
+html.quiet-x [data-testid="Tweet-User-Avatar"] img {
+  width: var(--qx-avatar) !important;
+  height: var(--qx-avatar) !important;
+  border-radius: 50% !important;
+  object-fit: cover;
+}
+
+html.quiet-x [data-testid="User-Name"] {
+  display: flex !important;
+  flex-flow: row wrap !important;
+  align-items: baseline !important;
+  gap: 0 6px !important;
+  min-width: 0;
+}
+
+html.quiet-x [data-testid="User-Name"] > div {
+  display: inline-flex !important;
+  align-items: baseline !important;
+  gap: 6px !important;
+  min-width: 0;
+}
+
+html.quiet-x [data-testid="User-Name"] > div:first-child,
+html.quiet-x [data-testid="User-Name"] > div:first-child a {
+  color: var(--qx-fg) !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+}
+
+html.quiet-x [data-testid="User-Name"] > div:last-child,
+html.quiet-x [data-testid="User-Name"] > div:last-child a,
+html.quiet-x [data-testid="User-Name"] time,
+html.quiet-x .qx-pinned {
+  color: var(--qx-muted) !important;
+  font-weight: 400 !important;
+  text-decoration: none !important;
+}
+
+html.quiet-x [data-testid="tweetText"] {
+  margin: 8px 0 12px !important;
+  color: var(--qx-fg) !important;
+  font-size: var(--qx-body-size) !important;
+  line-height: 1.5 !important;
+  white-space: pre-wrap;
+}
+
+html.quiet-x [data-testid="tweetText"] a {
+  color: var(--qx-fg) !important;
+  text-decoration: underline;
+  text-decoration-color: var(--qx-faint);
+}
+
+html.quiet-x [data-testid="socialContext"] {
+  color: var(--qx-muted) !important;
+  font-size: 13px !important;
+  text-transform: lowercase;
+}
+
+html.quiet-x [data-testid="tweetPhoto"],
+html.quiet-x [data-testid="videoPlayer"],
+html.quiet-x [data-testid="videoComponent"],
+html.quiet-x [data-testid="card.wrapper"] {
+  border-radius: var(--qx-radius) !important;
+  overflow: hidden !important;
+  margin-top: 4px !important;
+}
+
+html.quiet-x article[data-testid="tweet"] [data-testid="caret"] {
+  position: absolute !important;
+  top: 28px;
+  right: 0;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  color: var(--qx-muted) !important;
+  font-size: 0 !important;
+}
+
+html.quiet-x article[data-testid="tweet"] [data-testid="caret"] svg {
+  display: none !important;
+}
+
+html.quiet-x article[data-testid="tweet"] [data-testid="caret"]::after {
+  content: "···";
+  font-size: 16px;
+  letter-spacing: 1px;
+  color: var(--qx-muted);
+}
+
 @media (max-width: 860px) {
   html.quiet-x .qx-shell {
     flex-direction: column !important;
