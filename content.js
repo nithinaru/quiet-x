@@ -123,6 +123,7 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
       refreshCounts();
       updateNavActive();
       hideHomeComposer();
+      if (document.querySelector("[data-testid='primaryColumn']")) ensureBack();
       for (const article of articles()) transformArticle(article);
       if (document.readyState !== "loading") {
         document.documentElement.dataset.qxReady = "1";
@@ -339,8 +340,17 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
     return [...root.querySelectorAll('article[data-testid="tweet"]')];
   }
 
+  function isDetailArticle(article) {
+    if (!isStatusRoute()) return false;
+    const primary = article.closest('[data-testid="primaryColumn"]') || document;
+    const main =
+      primary.querySelector('article[data-testid="tweet"][tabindex="-1"]') ||
+      primary.querySelector('article[data-testid="tweet"]');
+    return article === main;
+  }
+
   function transformArticle(article) {
-    const mode = "timeline";
+    const mode = isDetailArticle(article) ? "detail" : "timeline";
     if (article.getAttribute("data-qx") === mode) {
       refreshArticle(article);
       return;
@@ -348,7 +358,8 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
     article.querySelectorAll(`[${UI}]`).forEach((node) => node.remove());
     article.setAttribute("data-qx", mode);
     inlinePinned(article);
-    buildTimeline(article);
+    if (mode === "detail") buildDetail(article);
+    else buildTimeline(article);
   }
 
   function inlinePinned(article) {
@@ -388,6 +399,68 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
     bar.append(metrics, buildActions(article, false));
     clipGroup(article);
     insertBeforeGroup(article, bar);
+  }
+
+  function buildDetail(article) {
+    const meta = buildMeta(article);
+    if (meta) insertBeforeGroup(article, meta);
+    const bar = document.createElement("div");
+    bar.className = "qx-bar is-detail";
+    bar.setAttribute(UI, "");
+    const actions = buildActions(article, true);
+    actions.setAttribute("data-qx-detail-actions", "");
+    bar.append(actions);
+    clipGroup(article);
+    insertBeforeGroup(article, bar);
+  }
+
+  function buildMeta(article) {
+    const time = article.querySelector("time");
+    if (!time) return null;
+    const iso = time.getAttribute("datetime");
+    const when = iso ? formatStamp(iso) : time.textContent.trim();
+    const views = article.querySelector('a[href*="/analytics"]');
+    const viewText = views ? formatViews(views.textContent) : "";
+    const line = document.createElement("p");
+    line.className = "qx-meta";
+    line.setAttribute(UI, "");
+    const whenSpan = document.createElement("span");
+    whenSpan.textContent = viewText ? `${when} · ` : when;
+    line.append(whenSpan);
+    if (viewText) {
+      const strong = document.createElement("strong");
+      strong.textContent = viewText;
+      line.append(strong);
+    }
+    if (views) views.classList.add("qx-clip");
+    return line;
+  }
+
+  function formatStamp(iso) {
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) return iso;
+    const parts = new Intl.DateTimeFormat("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+      timeZone: "UTC",
+    }).formatToParts(date);
+    const hour = parts.find((part) => part.type === "hour")?.value || "";
+    const minute = parts.find((part) => part.type === "minute")?.value || "";
+    const period = parts.find((part) => part.type === "dayPeriod")?.value || "";
+    const ampm = period.replace(/\./g, "").toUpperCase().startsWith("A") ? "AM" : "PM";
+    const month = new Intl.DateTimeFormat("en-US", {
+      month: "long",
+      timeZone: "UTC",
+    }).format(date);
+    return `${hour}:${minute} ${ampm} · ${month} ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
+  }
+
+  function formatViews(raw) {
+    const cleaned = raw.replace(/views?/gi, "").trim();
+    const match = cleaned.match(/^([\d.,]+)\s*([KMB])?$/i);
+    if (!match) return raw.trim().toLowerCase();
+    return `${match[1]}${(match[2] || "").toLowerCase()} views`;
   }
 
   function buildActions(article, withCount) {
@@ -527,6 +600,31 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
     const group = article.querySelector('[role="group"]');
     if (group?.parentElement) group.parentElement.insertBefore(node, group);
     else article.append(node);
+  }
+
+  function ensureBack() {
+    const primary = document.querySelector('[data-testid="primaryColumn"]');
+    if (!primary || primary.querySelector(":scope > .qx-back")) return;
+    const native =
+      primary.querySelector('[data-testid="app-bar-back"]') ||
+      document.querySelector('[data-testid="app-bar-back"]');
+    if (!native && !isStatusRoute()) return;
+    if (native) native.classList.add("qx-clip");
+    const back = document.createElement("button");
+    back.type = "button";
+    back.className = "qx-back";
+    back.setAttribute(UI, "");
+    back.textContent = isStatusRoute() ? "← post" : "←";
+    back.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const current =
+        primary.querySelector('[data-testid="app-bar-back"]') ||
+        document.querySelector('[data-testid="app-bar-back"]');
+      if (current) current.click();
+      else history.back();
+    });
+    primary.insertBefore(back, primary.firstChild);
   }
 
 function init() {

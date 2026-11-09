@@ -439,6 +439,40 @@ html.quiet-x .qx-action.is-on:hover {
   color: var(--qx-fg);
 }
 
+html.quiet-x [data-testid="showReplies"] {
+  background: transparent !important;
+  border: 0 !important;
+  padding: 8px 0 !important;
+  color: var(--qx-muted) !important;
+  font: inherit !important;
+  text-transform: lowercase;
+  cursor: pointer;
+}
+
+html.quiet-x [data-testid="op-badge"] {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 4px;
+  border: 1px solid var(--qx-faint);
+  border-radius: 4px;
+  color: var(--qx-muted) !important;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+html.quiet-x [role="menu"],
+html.quiet-x [data-testid="Dropdown"] {
+  background: var(--qx-bg) !important;
+  color: var(--qx-fg) !important;
+  border: 1px solid var(--qx-hairline) !important;
+}
+
+html.quiet-x [role="menuitem"] {
+  color: var(--qx-fg) !important;
+  background: transparent !important;
+}
+
 html.quiet-x .qx-nav-item:focus-visible,
 html.quiet-x .qx-action:focus-visible,
 html.quiet-x .qx-tool:focus-visible,
