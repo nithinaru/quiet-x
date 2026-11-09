@@ -310,6 +310,15 @@
       const rule = document.createElement("div");
       rule.className = "qx-nav-divider";
       rule.setAttribute(UI, "");
+      // The secret way back to regular X: triple-click the hairline. The
+      // toolbar icon or the options page turns quiet-x back on.
+      rule.addEventListener("click", (event) => {
+        if (event.detail !== 3) return;
+        event.preventDefault();
+        event.stopPropagation();
+        storageSet({ enabled: false });
+        stop();
+      });
       list.append(rule);
       list.append(
         rowButton("write", "write", "n", () => {

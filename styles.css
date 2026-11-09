@@ -183,9 +183,13 @@ html.quiet-x .qx-nav-hint {
 html.quiet-x .qx-nav-divider {
   height: 1px;
   width: 100%;
-  margin: 16px 0;
+  margin: 8px 0;
+  padding: 8px 0;
   background: var(--qx-hairline);
+  background-clip: content-box;
   border: 0;
+  cursor: default;
+  user-select: none;
 }
 
 html.quiet-x .qx-back {

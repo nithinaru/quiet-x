@@ -144,6 +144,13 @@ test("restyles the timeline and the detail view", async () => {
   await page.locator('[data-qx-nav="theme"]').click();
   await expect(page.locator("html")).toHaveAttribute("data-qx-theme", "dark");
 
+  await page.locator(".qx-nav-divider").click({ clickCount: 3 });
+  await expect(page.locator("html")).not.toHaveClass(/quiet-x/);
+  await expect(page.locator(".qx-navlist")).toHaveCount(0);
+  const [worker] = context.serviceWorkers();
+  await worker.evaluate(() => chrome.storage.local.set({ enabled: true }));
+  await expect(page.locator("html")).toHaveClass(/quiet-x/);
+
   await page.close();
 });
 
