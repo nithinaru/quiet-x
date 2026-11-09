@@ -231,3 +231,22 @@ article[data-testid="tweet"] {
   flex: 1;
   min-height: 24px;
 }
+
+/* Mirrors X: the column header is a row, and the post menu sits at the
+   right end of the name line. */
+.fx-appbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fx-appbar h2 {
+  margin: 0;
+  font-size: 17px;
+}
+
+article[data-testid="tweet"] [data-testid="caret"] {
+  position: absolute;
+  top: 16px;
+  right: 0;
+}

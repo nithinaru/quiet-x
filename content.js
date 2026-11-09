@@ -1,13 +1,13 @@
 (() => {
   "use strict";
 
-  const DEFAULTS = { enabled: true, hidePromoted: true, font: "inter", theme: "dark" };
+  const DEFAULTS = { enabled: true, hidePromoted: true, font: "inter", theme: "light" };
   const UI = "data-quiet-x-ui";
   const FIXTURE_PORT = "8765";
 
   const NAV = [
     { key: "home", label: "home", testids: ["AppTabBar_Home_Link"], hrefs: ["/home"] },
-    { key: "explore", label: "explore", testids: ["AppTabBar_Explore_Link"], hrefs: ["/explore"] },
+    { key: "explore", label: "search", hint: "/", testids: ["AppTabBar_Explore_Link"], hrefs: ["/explore"] },
     {
       key: "notifications",
       label: "notifications",
@@ -31,7 +31,25 @@
     { key: "profile", label: "profile", testids: ["AppTabBar_Profile_Link"], hrefs: [] },
   ];
 
-  const ACTION_KINDS = ["reply", "repost", "like", "keep", "share"];
+  const ACTION_KINDS = ["like", "repost", "keep", "share"];
+
+  // Hand-drawn 16px glyphs for the two actions that read better as marks.
+  // Like is a teardrop-heart, repost is a pair of offset loops.
+  const ICONS = {
+    like: "M8 13.4C5.2 11.2 2.5 9 2.5 6.2A2.9 2.9 0 0 1 8 4.8a2.9 2.9 0 0 1 5.5 1.4C13.5 9 10.8 11.2 8 13.4Z",
+    repost: "M2.8 9.5V6.2c0-1 .8-1.7 1.7-1.7h7.2M9.6 2.5l2.1 2-2.1 2M13.2 6.5v3.3c0 1-.8 1.7-1.7 1.7H4.3M6.4 13.5l-2.1-2 2.1-2",
+  };
+
+  function iconFor(kind) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 16 16");
+    svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("class", `qx-icon qx-icon-${kind}`);
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", ICONS[kind]);
+    svg.append(path);
+    return svg;
+  }
 
   let running = false;
   let observer = null;
@@ -104,9 +122,9 @@
   const systemLight = window.matchMedia?.("(prefers-color-scheme: light)");
 
   function resolvedTheme() {
-    if (themeSetting === "light") return "light";
+    if (themeSetting === "dark") return "dark";
     if (themeSetting === "system") return systemLight?.matches ? "light" : "dark";
-    return "dark";
+    return "light";
   }
 
   function paintTheme() {
@@ -118,7 +136,7 @@
 
   function applySettings(data) {
     const root = document.documentElement;
-    themeSetting = ["light", "system"].includes(data.theme) ? data.theme : "dark";
+    themeSetting = ["dark", "system"].includes(data.theme) ? data.theme : "light";
     paintTheme();
     root.dataset.qxFont = data.font === "system" ? "system" : "inter";
     root.dataset.qxPromoted = data.hidePromoted === false ? "show" : "hide";
@@ -222,6 +240,7 @@
       refreshCounts();
       updateNavActive();
       hideHomeComposer();
+      hideFloatingChat();
       if (document.querySelector("[data-testid='primaryColumn']")) ensureBack();
       for (const article of articles()) transformArticle(article);
       if (isStatusRoute()) transformComposer(document.querySelector("[data-testid='primaryColumn']"));
@@ -328,11 +347,6 @@
           document.querySelector('[data-testid="SideNav_NewTweet_Button"]')?.click();
         }),
       );
-      list.append(
-        rowButton("search", "search", "/", () => {
-          findLink(NAV[1])?.click();
-        }),
-      );
       const tone = rowButton("tone", "tone", "", () => {});
       const hint = document.createElement("span");
       hint.className = "qx-nav-hint";
@@ -381,7 +395,7 @@
   }
 
   function navButton(item) {
-    return rowButton(item.key, item.label, "", () => {
+    return rowButton(item.key, item.label, item.hint || "", () => {
       const link = findLink(item);
       if (link) link.click();
       else if (item.hrefs[0]) location.assign(item.hrefs[0]);
@@ -469,11 +483,31 @@
     if (!box) return;
     const holdsTimeline = (el) =>
       el.matches('[data-testid="primaryColumn"]') ||
-      Boolean(el.querySelector('article, section, [role="tablist"], [data-testid="cellInnerDiv"], h1, h2'));
+      Boolean(el.querySelector('article, section, a[role="tab"], [data-testid="cellInnerDiv"]'));
     let node = box;
     while (node.parentElement && !holdsTimeline(node.parentElement)) node = node.parentElement;
     if (holdsTimeline(node)) return;
     node.classList.add("qx-clip", "qx-home-composer");
+  }
+
+  // X's floating chat launcher sits fixed in the corner. Chat stays reachable
+  // from the nav, so the launcher is clipped. Found by its link, not its class.
+  function hideFloatingChat() {
+    const links = document.querySelectorAll(
+      'a[href^="/i/chat"], a[href^="/messages"], [data-testid^="chat-drawer"], [data-testid="DMDrawer"], ' +
+        'button[aria-label*="chat" i], [role="button"][aria-label*="chat" i], button[aria-label*="message" i], [role="button"][aria-label*="message" i]',
+    );
+    for (const link of links) {
+      if (link.closest('header[role="banner"], [data-testid="primaryColumn"], [data-quiet-x-ui]')) continue;
+      let node = link;
+      while (node && node !== document.body) {
+        if (getComputedStyle(node).position === "fixed") {
+          node.classList.add("qx-clip");
+          break;
+        }
+        node = node.parentElement;
+      }
+    }
   }
 
   function articles() {
@@ -674,7 +708,19 @@
   function paintAction(button, article, kind, withCount) {
     const native = findNative(article, kind);
     const text = buttonLabel(kind, native, withCount);
-    if (button.textContent !== text) button.textContent = text;
+    if (ICONS[kind]) {
+      if (!button.querySelector(".qx-icon")) {
+        button.textContent = "";
+        const count = document.createElement("span");
+        count.className = "qx-count";
+        button.append(iconFor(kind), count);
+      }
+      const count = withCount ? visibleCount(native) : "";
+      const slot = button.querySelector(".qx-count");
+      if (slot.textContent !== count) slot.textContent = count;
+    } else if (button.textContent !== text) {
+      button.textContent = text;
+    }
     const on = isOn(kind, native);
     button.classList.toggle("is-on", on);
     if (kind === "like" || kind === "keep" || kind === "repost") {
@@ -872,8 +918,13 @@
     const native =
       primary.querySelector('[data-testid="app-bar-back"]') ||
       document.querySelector('[data-testid="app-bar-back"]');
-    if (!native && !isStatusRoute()) return;
-    if (native) native.classList.add("qx-clip");
+    if (native) {
+      // Keep X's own control in X's header and draw it as a plain arrow.
+      native.classList.remove("qx-clip");
+      native.classList.add("qx-native-back");
+      return;
+    }
+    if (!isStatusRoute()) return;
     const back = document.createElement("button");
     back.type = "button";
     back.className = "qx-back";

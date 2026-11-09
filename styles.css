@@ -1,11 +1,11 @@
 /* Design tokens. Change these, not the rules below. */
 :root {
-  --qx-bg: #000000;
-  --qx-fg: #ffffff;
-  --qx-muted: #9a9a9a;
-  --qx-nav: #d4d4d4;
-  --qx-faint: #7a7a7a;
-  --qx-hairline: #2a2a2a;
+  --qx-bg: #141414;
+  --qx-fg: #ededed;
+  --qx-muted: #a0a0a0;
+  --qx-nav: #d0d0d0;
+  --qx-faint: #808080;
+  --qx-hairline: #2c2c2c;
   --qx-font: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --qx-nav-size: 15px;
   --qx-body-size: 15.5px;
@@ -16,7 +16,7 @@
   --qx-column-gap: 64px;
   --qx-radius: 12px;
   --qx-avatar: 40px;
-  --qx-post-pad-y: 28px;
+  --qx-post-pad-y: 16px;
   --qx-line: 1.45;
   --qx-scheme: dark;
 }
@@ -342,7 +342,7 @@ html.quiet-x .qx-pinned {
 }
 
 html.quiet-x [data-testid="tweetText"] {
-  margin: 8px 0 12px !important;
+  margin: 2px 0 4px !important;
   color: var(--qx-fg) !important;
   font-size: var(--qx-body-size) !important;
   line-height: 1.5 !important;
@@ -361,19 +361,60 @@ html.quiet-x [data-testid="socialContext"] {
   text-transform: lowercase;
 }
 
+/* Quoted posts: the one framed block inside a post, smaller and quieter. */
+html.quiet-x article[data-testid="tweet"] [role="link"]:has([data-testid="User-Name"]) {
+  margin-top: 6px !important;
+  padding: 12px 14px !important;
+  border: 1px solid var(--qx-hairline) !important;
+  border-radius: var(--qx-radius) !important;
+  background: transparent !important;
+}
+
+html.quiet-x article[data-testid="tweet"] [role="link"]:has([data-testid="User-Name"]) [data-testid="tweetText"] {
+  font-size: calc(var(--qx-body-size) - 1px) !important;
+  margin: 2px 0 0 !important;
+}
+
+html.quiet-x article[data-testid="tweet"] [role="link"] [data-testid="Tweet-User-Avatar"],
+html.quiet-x article[data-testid="tweet"] [role="link"] [data-testid="Tweet-User-Avatar"] img,
+html.quiet-x article[data-testid="tweet"] [role="link"] [data-testid^="UserAvatar-Container"] {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+/* X's own back control, drawn as a plain arrow beside the header title. */
+html.quiet-x [data-testid="app-bar-back"].qx-native-back {
+  display: inline-flex !important;
+  align-items: center;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin-right: 8px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  color: var(--qx-fg) !important;
+  cursor: pointer;
+}
+
+html.quiet-x [data-testid="app-bar-back"].qx-native-back svg {
+  display: none !important;
+}
+
+html.quiet-x [data-testid="app-bar-back"].qx-native-back::before {
+  content: "←";
+  font-size: 17px;
+  line-height: 1;
+}
+
 html.quiet-x [data-testid="tweetPhoto"],
 html.quiet-x [data-testid="videoPlayer"],
 html.quiet-x [data-testid="videoComponent"],
 html.quiet-x [data-testid="card.wrapper"] {
   border-radius: var(--qx-radius) !important;
   overflow: hidden !important;
-  margin-top: 4px !important;
 }
 
 html.quiet-x article[data-testid="tweet"] [data-testid="caret"] {
-  position: absolute !important;
-  top: 28px;
-  right: 0;
   width: auto !important;
   height: auto !important;
   padding: 0 !important;
@@ -395,11 +436,13 @@ html.quiet-x article[data-testid="tweet"] [data-testid="caret"]::after {
 }
 
 html.quiet-x .qx-bar {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 16px;
-  margin-top: 12px;
+  margin-top: 6px;
 }
 
 html.quiet-x .qx-bar.is-detail {
@@ -463,6 +506,35 @@ html.quiet-x .qx-sep {
 html.quiet-x .qx-sep {
   cursor: default;
   white-space: pre;
+}
+
+html.quiet-x .qx-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+html.quiet-x .qx-icon {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform: translateY(1px);
+}
+
+html.quiet-x .qx-action.is-on .qx-icon-like {
+  fill: currentColor;
+}
+
+html.quiet-x .qx-action.is-on .qx-icon-repost {
+  stroke-width: 2.1;
+}
+
+html.quiet-x .qx-count:empty {
+  display: none;
 }
 
 html.quiet-x .qx-action.is-on,

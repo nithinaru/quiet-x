@@ -88,9 +88,15 @@
     return c;
   }
 
+  // Neutral grays X uses outside the known tables (new widgets keep adding
+  // shades): near-black or near-white reads as primary, the middle as muted.
+  const isNeutral = (c) => Math.max(c.r, c.g, c.b) - Math.min(c.r, c.g, c.b) <= 14;
+
   function mapText(c) {
     if (!c || c.a < 1) return null;
-    return TEXT_MAP.get(c.key) || (isBlue(c) ? FG : null);
+    const known = TEXT_MAP.get(c.key) || (isBlue(c) ? FG : null);
+    if (known || !isNeutral(c)) return known;
+    return c.r <= 60 || c.r >= 215 ? FG : MUTED;
   }
 
   // Returns { value, only } — `only` means "touch nothing else in this rule"
@@ -100,7 +106,9 @@
     if (isBlue(c)) return c.a >= 1 ? { value: FG, only: true } : { value: CLEAR };
     if (c.a >= 1) {
       const v = BG_MAP.get(c.key);
-      return v ? { value: v } : null;
+      if (v) return { value: v };
+      // Other neutral surfaces (sports widgets, cards, pills) melt into the ground.
+      return isNeutral(c) ? { value: CLEAR } : null;
     }
     if (c.a <= FAINT_ALPHA && FAINT_SET.has(c.key)) return { value: CLEAR };
     return null;
@@ -108,7 +116,9 @@
 
   function mapBorder(c) {
     if (!c || c.a < 1) return null;
-    return BORDER_MAP.get(c.key) || (isBlue(c) ? MUTED : null);
+    const known = BORDER_MAP.get(c.key) || (isBlue(c) ? MUTED : null);
+    if (known) return known;
+    return isNeutral(c) && c.r > 20 && c.r < 245 ? CLEAR : null;
   }
 
   const BORDER_SIDES = [
@@ -124,7 +134,11 @@
     if (bg && bg.only) return "background-color:" + bg.value + " !important;";
 
     let out = "";
-    if (bg) out += "background-color:" + bg.value + " !important;";
+    // Sticky bars (column headers, tab rows) sit over scrolling posts, so they
+    // get the opaque ground instead of X's translucent blur.
+    if (style.position === "sticky") {
+      out += "background-color:var(--qx-bg) !important;backdrop-filter:none !important;";
+    } else if (bg) out += "background-color:" + bg.value + " !important;";
     const color = mapText(parseColor(style.color));
     if (color) out += "color:" + color + " !important;";
     // Per-side longhands cover `border-color` too (the shorthand only

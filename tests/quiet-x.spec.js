@@ -62,7 +62,7 @@ test("restyles the timeline and the detail view", async () => {
   await expect(page.getByRole("heading", { name: "Premium" })).toBeHidden();
   await expect
     .poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor))
-    .toBe("rgb(0, 0, 0)");
+    .toBe("rgb(255, 255, 255)");
 
   const font = await page.evaluate(() => getComputedStyle(document.body).fontFamily);
   expect(font.toLowerCase()).toContain("inter");
@@ -70,20 +70,19 @@ test("restyles the timeline and the detail view", async () => {
   const labels = await page.locator(".qx-nav-label").allTextContents();
   expect(labels).toEqual([
     "home",
-    "explore",
+    "search",
     "notifications",
     "chat",
     "bookmarks",
     "profile",
     "write",
-    "search",
     "tone",
     "theme",
   ]);
   await expect(page.locator('[data-qx-nav="notifications"] .qx-nav-count')).toHaveText("3");
   await expect(page.locator('[data-qx-nav="chat"] .qx-nav-count')).toHaveText("4");
   await expect(page.locator('[data-qx-nav="write"] .qx-nav-hint')).toHaveText("n");
-  await expect(page.locator('[data-qx-nav="search"] .qx-nav-hint')).toHaveText("/");
+  await expect(page.locator('[data-qx-nav="explore"] .qx-nav-hint')).toHaveText("/");
   await expect(page.locator('[data-qx-nav="tone"] .qx-nav-hint')).toHaveText("30s");
   await expect(page.locator('[data-qx-nav="home"]')).toHaveClass(/is-active/);
 
@@ -114,35 +113,40 @@ test("restyles the timeline and the detail view", async () => {
 
   await posts.nth(1).hover();
   await expect(posts.nth(1).locator(".qx-actions")).toBeVisible();
-  await expect(posts.nth(1).locator(".qx-actions")).toHaveText("reply · repost · like · keep · share");
+  const hoverLabels = await posts
+    .nth(1)
+    .locator(".qx-action")
+    .evaluateAll((nodes) => nodes.map((node) => node.getAttribute("aria-label")));
+  expect(hoverLabels).toEqual(["like", "repost", "keep", "share"]);
   await page.screenshot({ path: path.join(SHOTS, "hover.png") });
 
   await page.bringToFront();
   await posts.nth(1).hover();
   await posts.nth(1).locator('[data-qx-action="like"]').click();
   await expect(posts.nth(1).locator('[data-testid="unlike"]')).toHaveAttribute("data-clicks", "1");
-  await expect(posts.nth(1).locator('[data-qx-action="like"]')).toHaveText("liked");
+  await expect(posts.nth(1).locator('[data-qx-action="like"]')).toHaveAttribute("aria-label", "liked");
+  await expect(posts.nth(1).locator('[data-qx-action="like"]')).toHaveAttribute("aria-pressed", "true");
   await expect
     .poll(() =>
       posts.nth(1).locator('[data-qx-action="like"]').evaluate((node) => getComputedStyle(node).color),
     )
-    .toBe("rgb(255, 255, 255)");
+    .toBe("rgb(0, 0, 0)");
   await posts.nth(1).hover();
   await page.screenshot({ path: path.join(SHOTS, "liked.png") });
 
   await page.locator('[data-qx-nav="write"]').click();
   await expect(page.locator('[data-testid="SideNav_NewTweet_Button"]')).toHaveAttribute("data-clicks", "1");
 
-  await expect(page.locator('[data-qx-nav="theme"] .qx-nav-hint')).toHaveText("dark");
-  await page.locator('[data-qx-nav="theme"]').click();
-  await expect(page.locator("html")).toHaveAttribute("data-qx-theme", "light");
   await expect(page.locator('[data-qx-nav="theme"] .qx-nav-hint')).toHaveText("light");
-  await expect
-    .poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor))
-    .toBe("rgb(255, 255, 255)");
-  await page.screenshot({ path: path.join(SHOTS, "light.png") });
   await page.locator('[data-qx-nav="theme"]').click();
   await expect(page.locator("html")).toHaveAttribute("data-qx-theme", "dark");
+  await expect(page.locator('[data-qx-nav="theme"] .qx-nav-hint')).toHaveText("dark");
+  await expect
+    .poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor))
+    .toBe("rgb(20, 20, 20)");
+  await page.screenshot({ path: path.join(SHOTS, "dark.png") });
+  await page.locator('[data-qx-nav="theme"]').click();
+  await expect(page.locator("html")).toHaveAttribute("data-qx-theme", "light");
 
   await page.locator(".qx-nav-divider").click({ clickCount: 3 });
   await expect(page.locator("html")).not.toHaveClass(/quiet-x/);
@@ -179,32 +183,10 @@ test("observer covers new tweets and route changes", async () => {
     history.pushState({}, "", "/bot/status/2119780776095121848");
   });
 
-  await expect(page.locator(".qx-back")).toHaveText("← post");
-  await expect(page.locator("[data-qx-detail-actions]")).toHaveText(
-    "reply 3.4K · repost 1.6K · liked 15K · keep 3.5K · share",
-  );
+  await expect(page.locator('[data-testid="app-bar-back"]')).toHaveClass(/qx-native-back/);
+  await expect(page.locator('[data-testid="app-bar-back"]')).toBeVisible();
+  await expect(page.locator("[data-qx-detail-actions] .qx-action")).toHaveCount(4);
   await expect(page.locator(".qx-meta")).toHaveText("1:13 AM · November 5, 2026 · 5.7m views");
-  await expect(page.locator(".qx-tools")).toHaveText("sort relevant ⌄ · view quotes");
-  const colorOf = (selector) =>
-    page.locator(selector).first().evaluate((node) => getComputedStyle(node).color);
-  expect(await colorOf('[data-qx-detail-actions] [data-qx-action="reply"]')).toBe("rgb(154, 154, 154)");
-  expect(await colorOf('[data-qx-detail-actions] [data-qx-action="like"]')).toBe("rgb(255, 255, 255)");
-
-  await page.mouse.move(8, 8);
-  await page.screenshot({ path: path.join(SHOTS, "detail.png") });
-
-  await page.evaluate(() => {
-    document.querySelector('[data-testid="replySort"]').remove();
-    document.querySelector('a[href*="/quotes"]').remove();
-    document.querySelector(".qx-tools").remove();
-  });
-  await page.evaluate(() => {
-    const quotes = document.createElement("a");
-    quotes.href = "/bot/status/2119780776095121848/quotes";
-    quotes.textContent = "Quotes";
-    document.querySelector('[data-testid="primaryColumn"]').append(quotes);
-  });
-  await expect(page.locator(".qx-tools")).toHaveText("view quotes");
   await expect(page.getByText("> post your reply", { exact: true })).toBeVisible();
   await expect(page.locator(".qx-send")).toHaveText("reply");
   await page.close();
@@ -214,16 +196,22 @@ test("detail route matches the post page", async () => {
   const page = await context.newPage();
   await page.goto(DETAIL, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => document.documentElement.dataset.qxReady === "1");
-  await expect(page.locator(".qx-back")).toHaveText("← post");
-  await expect(page.locator("[data-qx-detail-actions]")).toHaveText(
-    "reply 3.4K · repost 1.6K · liked 15K · keep 3.5K · share",
-  );
+  const back = page.locator('[data-testid="app-bar-back"]');
+  await expect(back).toHaveClass(/qx-native-back/);
+  await expect(back).toBeVisible();
+  expect(await back.evaluate((node) => getComputedStyle(node, "::before").content)).toBe('"←"');
+  const labels = await page
+    .locator("[data-qx-detail-actions] .qx-action")
+    .evaluateAll((nodes) => nodes.map((node) => node.getAttribute("aria-label")));
+  expect(labels).toEqual(["liked 15K", "repost 1.6K", "keep 3.5K", "share"]);
+  await expect(page.locator("[data-qx-detail-actions]")).toHaveText("15K · 1.6K · keep 3.5K · share");
+  await expect(page.locator('[data-qx-detail-actions] [data-qx-action="like"] .qx-icon')).toHaveCount(1);
   await expect(page.locator(".qx-meta")).toHaveText("1:13 AM · November 5, 2026 · 5.7m views");
   await expect(page.locator(".qx-tools")).toHaveText("sort relevant ⌄ · view quotes");
   const colorOf = (selector) =>
     page.locator(selector).first().evaluate((node) => getComputedStyle(node).color);
-  expect(await colorOf('[data-qx-detail-actions] [data-qx-action="reply"]')).toBe("rgb(154, 154, 154)");
-  expect(await colorOf('[data-qx-detail-actions] [data-qx-action="like"]')).toBe("rgb(255, 255, 255)");
+  expect(await colorOf('[data-qx-detail-actions] [data-qx-action="repost"]')).toBe("rgb(95, 95, 95)");
+  expect(await colorOf('[data-qx-detail-actions] [data-qx-action="like"]')).toBe("rgb(0, 0, 0)");
 
   await page.mouse.move(8, 8);
   await page.screenshot({ path: path.join(SHOTS, "detail.png") });

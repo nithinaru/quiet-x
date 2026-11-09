@@ -1,4 +1,4 @@
-const DEFAULTS = { enabled: true, hidePromoted: true, font: "inter", theme: "dark" };
+const DEFAULTS = { enabled: true, hidePromoted: true, font: "inter", theme: "light" };
 const enabled = document.querySelector("#enabled");
 const hidePromoted = document.querySelector("#hidePromoted");
 const font = document.querySelector("#font");
@@ -15,7 +15,7 @@ chrome.storage.local.get(DEFAULTS, (data) => {
   enabled.checked = data.enabled !== false;
   hidePromoted.checked = data.hidePromoted !== false;
   font.value = data.font === "system" ? "system" : "inter";
-  theme.value = ["light", "system"].includes(data.theme) ? data.theme : "dark";
+  theme.value = ["dark", "system"].includes(data.theme) ? data.theme : "light";
   paintTheme();
   document.body.dataset.ready = "1";
 });
