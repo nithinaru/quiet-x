@@ -4,6 +4,32 @@
   const UI = "data-quiet-x-ui";
   const FIXTURE_PORT = "8765";
 
+  const NAV = [
+    { key: "home", label: "home", testids: ["AppTabBar_Home_Link"], hrefs: ["/home"] },
+    { key: "explore", label: "explore", testids: ["AppTabBar_Explore_Link"], hrefs: ["/explore"] },
+    {
+      key: "notifications",
+      label: "notifications",
+      testids: ["AppTabBar_Notifications_Link"],
+      hrefs: ["/notifications"],
+      count: true,
+    },
+    {
+      key: "chat",
+      label: "chat",
+      testids: ["AppTabBar_DirectMessage_Link"],
+      hrefs: ["/messages", "/i/chat"],
+      count: true,
+    },
+    {
+      key: "bookmarks",
+      label: "bookmarks",
+      testids: ["AppTabBar_Bookmarks_Link"],
+      hrefs: ["/i/bookmarks"],
+    },
+    { key: "profile", label: "profile", testids: ["AppTabBar_Profile_Link"], hrefs: [] },
+  ];
+
   let running = false;
   let observer = null;
   let scheduled = false;
@@ -75,6 +101,10 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
     if (!running) return;
     try {
       centerShell();
+      renderNav();
+      refreshCounts();
+      updateNavActive();
+      hideHomeComposer();
     } catch (error) {
       console.error("quiet-x", error);
     }
@@ -86,6 +116,195 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
     if (!header || !main) return;
     const parent = header.parentElement;
     if (parent && parent.contains(main)) parent.classList.add("qx-shell");
+  }
+
+  function findNav() {
+    return (
+      document.querySelector('nav[aria-label="Primary"]') ||
+      document.querySelector('[data-testid="SideNav_Nav"]') ||
+      document.querySelector('header[role="banner"] nav')
+    );
+  }
+
+  function pathOf(href) {
+    if (!href) return "";
+    return href.split("?")[0].split("#")[0];
+  }
+
+  function hrefMatches(href, part) {
+    const path = pathOf(href);
+    return path === part || path.startsWith(`${part}/`);
+  }
+
+  function findLink(item) {
+    for (const id of item.testids) {
+      const found = document.querySelector(`[data-testid="${id}"]`);
+      if (found) return found;
+    }
+    if (item.hrefs?.length) {
+      for (const link of document.querySelectorAll("a[href]")) {
+        const href = link.getAttribute("href") || "";
+        if (item.hrefs.some((part) => hrefMatches(href, part))) return link;
+      }
+    }
+    if (item.key === "profile") return document.querySelector('a[aria-label="Profile"]');
+    return null;
+  }
+
+  function renderNav() {
+    const nav = findNav();
+    if (!nav) return;
+    if (!nav.querySelector(".qx-navlist")) {
+      const list = document.createElement("div");
+      list.className = "qx-navlist";
+      list.setAttribute(UI, "");
+      for (const item of NAV) list.append(navButton(item));
+      const rule = document.createElement("div");
+      rule.className = "qx-nav-divider";
+      rule.setAttribute(UI, "");
+      list.append(rule);
+      list.append(
+        rowButton("write", "write", "n", () => {
+          document.querySelector('[data-testid="SideNav_NewTweet_Button"]')?.click();
+        }),
+      );
+      list.append(
+        rowButton("search", "search", "/", () => {
+          findLink(NAV[1])?.click();
+        }),
+      );
+      const tone = rowButton("tone", "tone", "", () => {});
+      const hint = document.createElement("span");
+      hint.className = "qx-nav-hint";
+      tone.append(hint);
+      list.append(tone);
+      nav.append(list);
+      startTone(hint);
+    }
+    const header = nav.closest("header") || nav;
+    header.querySelectorAll("a, button").forEach((control) => {
+      if (control.closest(`[${UI}]`)) return;
+      control.classList.add("qx-clip");
+    });
+  }
+
+  function rowButton(key, label, hint, onClick) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "qx-nav-item";
+    button.dataset.qxNav = key;
+    button.setAttribute(UI, "");
+    const text = document.createElement("span");
+    text.className = "qx-nav-label";
+    text.textContent = label;
+    button.append(text);
+    if (hint) {
+      const side = document.createElement("span");
+      side.className = "qx-nav-hint";
+      side.textContent = hint;
+      button.append(side);
+    }
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      onClick();
+    });
+    return button;
+  }
+
+  function navButton(item) {
+    return rowButton(item.key, item.label, "", () => {
+      findLink(item)?.click();
+    });
+  }
+
+  function startTone(node) {
+    window.clearInterval(toneTimer);
+    toneTimer = 0;
+    const frozen = new URLSearchParams(location.search).get("qx-tone");
+    const started = Date.now();
+    const paint = () => {
+      node.textContent = frozen || formatElapsed(Date.now() - started);
+    };
+    paint();
+    if (!frozen) toneTimer = window.setInterval(paint, 1000);
+  }
+
+  function formatElapsed(ms) {
+    const seconds = Math.max(0, Math.floor(ms / 1000));
+    if (seconds < 60) return `${seconds}s`;
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m`;
+    return `${Math.floor(minutes / 60)}h`;
+  }
+
+  function badgeCount(anchor) {
+    if (!anchor) return "";
+    const label = anchor.getAttribute("aria-label") || "";
+    const fromLabel = label.match(/(\d[\d,]*)\s+unread/i);
+    if (fromLabel) return fromLabel[1].replace(/,/g, "");
+    const texts = [...anchor.querySelectorAll("span, div")]
+      .map((node) => node.textContent.trim())
+      .filter((text) => /^\d{1,4}$/.test(text));
+    return texts[0] || "";
+  }
+
+  function refreshCounts() {
+    for (const item of NAV) {
+      if (!item.count) continue;
+      const parent = document.querySelector(`[data-qx-nav="${item.key}"]`);
+      if (!parent) continue;
+      const value = badgeCount(findLink(item));
+      let slot = parent.querySelector(".qx-nav-count");
+      if (!value) {
+        slot?.remove();
+        continue;
+      }
+      if (!slot) {
+        slot = document.createElement("span");
+        slot.className = "qx-nav-count";
+        slot.setAttribute(UI, "");
+        parent.append(slot);
+      }
+      if (slot.textContent !== value) slot.textContent = value;
+      parent.setAttribute("aria-label", `${item.label}, ${value} unread`);
+    }
+  }
+
+  function updateNavActive() {
+    for (const item of NAV) {
+      const row = document.querySelector(`[data-qx-nav="${item.key}"]`);
+      if (!row) continue;
+      const native = findLink(item);
+      const active = isActive(item, native);
+      row.classList.toggle("is-active", active);
+      if (active) row.setAttribute("aria-current", "page");
+      else row.removeAttribute("aria-current");
+    }
+  }
+
+  function isActive(item, native) {
+    const path = location.pathname;
+    const nativePath = pathOf(native?.getAttribute("href") || "");
+    if (item.key === "profile") return Boolean(nativePath) && path === nativePath;
+    if (item.key === "home") return path === "/home" || path === "/" || path === nativePath;
+    if (!nativePath) return false;
+    return path === nativePath || path.startsWith(`${nativePath}/`);
+  }
+
+  function hideHomeComposer() {
+    if (isStatusRoute()) return;
+    const box = document.querySelector('[data-testid="primaryColumn"] [data-testid="tweetTextarea_0"]');
+    if (!box) return;
+    let node = box;
+    while (
+      node.parentElement &&
+      node.parentElement.getAttribute("data-testid") !== "primaryColumn"
+    ) {
+      node = node.parentElement;
+    }
+    if (node.getAttribute("data-testid") === "primaryColumn") return;
+    if (!node.querySelector("article[data-testid='tweet']")) node.classList.add("qx-clip");
   }
 
 function init() {

@@ -119,6 +119,54 @@ html.quiet-x a[href$="/header_photo"] {
   display: none !important;
 }
 
+html.quiet-x .qx-navlist {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding-top: 8px;
+}
+
+html.quiet-x .qx-nav-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  margin: 0;
+  padding: 11px 0;
+  background: transparent;
+  border: 0;
+  color: var(--qx-nav);
+  font: inherit;
+  font-size: var(--qx-nav-size);
+  line-height: 1.2;
+  text-align: left;
+  text-transform: lowercase;
+  cursor: pointer;
+  appearance: none;
+}
+
+html.quiet-x .qx-nav-item.is-active,
+html.quiet-x .qx-nav-item.is-active .qx-nav-label {
+  color: var(--qx-fg);
+}
+
+html.quiet-x .qx-nav-count,
+html.quiet-x .qx-nav-hint {
+  color: var(--qx-faint);
+  font-variant-numeric: tabular-nums;
+  min-width: 1.5em;
+  text-align: right;
+}
+
+html.quiet-x .qx-nav-divider {
+  height: 1px;
+  width: 100%;
+  margin: 16px 0;
+  background: var(--qx-hairline);
+  border: 0;
+}
+
 @media (max-width: 860px) {
   html.quiet-x .qx-shell {
     flex-direction: column !important;
