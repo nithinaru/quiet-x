@@ -502,6 +502,11 @@ html.quiet-x .qx-composer [data-testid="tweetTextarea_0"].is-empty {
   caret-color: var(--qx-fg);
 }
 
+/* Draft.js draws its own "Post your reply" placeholder; ours replaces it. */
+html.quiet-x[data-qx-status="1"] [data-testid="primaryColumn"] .public-DraftEditorPlaceholder-root {
+  display: none !important;
+}
+
 html.quiet-x .qx-prompt {
   position: absolute;
   left: 0;

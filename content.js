@@ -212,6 +212,9 @@
         document.querySelectorAll("article[data-testid='tweet']").forEach((article) => {
           article.removeAttribute("data-qx");
         });
+        document.querySelectorAll(".qx-home-composer").forEach((node) => {
+          node.classList.remove("qx-clip", "qx-home-composer");
+        });
       }
       globalThis.quietXPalette?.sync();
       centerShell();
@@ -464,15 +467,13 @@
     if (isStatusRoute()) return;
     const box = document.querySelector('[data-testid="primaryColumn"] [data-testid="tweetTextarea_0"]');
     if (!box) return;
+    const holdsTimeline = (el) =>
+      el.matches('[data-testid="primaryColumn"]') ||
+      Boolean(el.querySelector('article, section, [role="tablist"], [data-testid="cellInnerDiv"], h1, h2'));
     let node = box;
-    while (
-      node.parentElement &&
-      node.parentElement.getAttribute("data-testid") !== "primaryColumn"
-    ) {
-      node = node.parentElement;
-    }
-    if (node.getAttribute("data-testid") === "primaryColumn") return;
-    if (!node.querySelector("article[data-testid='tweet']")) node.classList.add("qx-clip");
+    while (node.parentElement && !holdsTimeline(node.parentElement)) node = node.parentElement;
+    if (holdsTimeline(node)) return;
+    node.classList.add("qx-clip", "qx-home-composer");
   }
 
   function articles() {
@@ -571,8 +572,18 @@
     insertBeforeGroup(article, bar);
   }
 
+  function postTime(article) {
+    const id = location.pathname.match(/\/status\/(\d+)/)?.[1];
+    const times = [...article.querySelectorAll("time")];
+    if (id) {
+      const own = times.find((time) => time.closest("a")?.getAttribute("href")?.includes(`/status/${id}`));
+      if (own) return own;
+    }
+    return times[times.length - 1] || null;
+  }
+
   function buildMeta(article) {
-    const time = article.querySelector("time");
+    const time = postTime(article);
     if (!time) return null;
     const iso = time.getAttribute("datetime");
     const when = iso ? formatStamp(iso) : time.textContent.trim();
@@ -740,6 +751,7 @@
       if (metrics.textContent !== next) metrics.textContent = next;
     }
     const withCount = article.getAttribute("data-qx") === "detail";
+    if (withCount) refreshDetail(article);
     for (const kind of ACTION_KINDS) {
       const button = article.querySelector(`[data-qx-action="${kind}"]`);
       if (button) paintAction(button, article, kind, withCount);
@@ -754,6 +766,37 @@
     if (group && article.contains(group)) return group;
     const groups = article.querySelectorAll('[role="group"]');
     return groups[groups.length - 1] || null;
+  }
+
+  // X renders the views link, sort control and quotes link after the post,
+  // so the detail extras are filled in whenever they show up.
+  function refreshDetail(article) {
+    if (!article.querySelector(".qx-meta")) {
+      const meta = buildMeta(article);
+      const bar = article.querySelector(".qx-bar.is-detail");
+      if (meta && bar) bar.before(meta);
+    } else {
+      const views = article.querySelector('a[href*="/analytics"]:not(.qx-clip)');
+      const meta = views ? buildMeta(article) : null;
+      if (meta) article.querySelector(".qx-meta").replaceWith(meta);
+    }
+    const bar = article.querySelector(".qx-bar.is-detail");
+    const tools = bar?.querySelector(".qx-tools");
+    const scope = article.closest('[data-testid="primaryColumn"]') || article;
+    const hasSort = Boolean(scope.querySelector('[data-testid="replySort"]'));
+    const hasQuotes = Boolean(scope.querySelector('a[href*="/quotes"]'));
+    const shown = tools ? tools.querySelectorAll(".qx-tool").length : 0;
+    if (bar && shown < Number(hasSort) + Number(hasQuotes)) {
+      tools?.remove();
+      const next = buildTools(article);
+      if (next) bar.append(next);
+    }
+    const sortButton = bar?.querySelector('[data-qx-tool="sort"]');
+    const sort = scope.querySelector('[data-testid="replySort"]');
+    if (sortButton && sort) {
+      const label = sortLabel(sort.textContent || "");
+      if (sortButton.textContent !== label) sortButton.textContent = label;
+    }
   }
 
   function clipGroup(article) {
@@ -781,6 +824,7 @@
       const button = document.createElement("button");
       button.type = "button";
       button.className = "qx-tool";
+      button.dataset.qxTool = "sort";
       button.setAttribute(UI, "");
       button.textContent = sortLabel(sort.textContent || "");
       button.addEventListener("click", (event) => {
@@ -807,7 +851,7 @@
       button.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
-        quotes.click();
+        (scope.querySelector('a[href*="/quotes"]') || quotes).click();
       });
       tools.append(button);
       quotes.classList.add("qx-clip");
@@ -847,6 +891,13 @@
     primary.insertBefore(back, primary.firstChild);
   }
 
+  function syncComposer(shell, box) {
+    const prompt = shell.querySelector(".qx-prompt");
+    const empty = !(box.textContent || "").replace(/\u200b/g, "").trim();
+    if (prompt && prompt.hidden === empty) prompt.hidden = !empty;
+    box.classList.toggle("is-empty", empty);
+  }
+
   function transformComposer(primary) {
     if (!primary) return;
     const box = primary.querySelector('[data-testid="tweetTextarea_0"]');
@@ -870,14 +921,15 @@
         primary.querySelector('[data-testid="tweetButton"], [data-testid="tweetButtonInline"]')?.click();
       });
       shell.append(prompt, send);
-      const sync = () => {
-        const empty = !(box.textContent || "").trim();
-        prompt.hidden = !empty;
-        box.classList.toggle("is-empty", empty);
-      };
-      box.addEventListener("input", sync);
-      sync();
+      if (!box.dataset.qxSync) {
+        box.dataset.qxSync = "1";
+        box.addEventListener("input", () => {
+          const current = box.closest(".qx-composer");
+          if (current) syncComposer(current, box);
+        });
+      }
     }
+    syncComposer(shell, box);
     primary.querySelector('[data-testid="toolBar"]')?.classList.add("qx-clip");
     primary.querySelector('[data-testid="tweetButton"], [data-testid="tweetButtonInline"]')?.classList.add("qx-clip");
   }

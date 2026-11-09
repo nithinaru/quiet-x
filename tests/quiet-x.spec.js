@@ -185,6 +185,26 @@ test("observer covers new tweets and route changes", async () => {
   );
   await expect(page.locator(".qx-meta")).toHaveText("1:13 AM · November 5, 2026 · 5.7m views");
   await expect(page.locator(".qx-tools")).toHaveText("sort relevant ⌄ · view quotes");
+  const colorOf = (selector) =>
+    page.locator(selector).first().evaluate((node) => getComputedStyle(node).color);
+  expect(await colorOf('[data-qx-detail-actions] [data-qx-action="reply"]')).toBe("rgb(154, 154, 154)");
+  expect(await colorOf('[data-qx-detail-actions] [data-qx-action="like"]')).toBe("rgb(255, 255, 255)");
+
+  await page.mouse.move(8, 8);
+  await page.screenshot({ path: path.join(SHOTS, "detail.png") });
+
+  await page.evaluate(() => {
+    document.querySelector('[data-testid="replySort"]').remove();
+    document.querySelector('a[href*="/quotes"]').remove();
+    document.querySelector(".qx-tools").remove();
+  });
+  await page.evaluate(() => {
+    const quotes = document.createElement("a");
+    quotes.href = "/bot/status/2119780776095121848/quotes";
+    quotes.textContent = "Quotes";
+    document.querySelector('[data-testid="primaryColumn"]').append(quotes);
+  });
+  await expect(page.locator(".qx-tools")).toHaveText("view quotes");
   await expect(page.getByText("> post your reply", { exact: true })).toBeVisible();
   await expect(page.locator(".qx-send")).toHaveText("reply");
   await page.close();
@@ -200,6 +220,26 @@ test("detail route matches the post page", async () => {
   );
   await expect(page.locator(".qx-meta")).toHaveText("1:13 AM · November 5, 2026 · 5.7m views");
   await expect(page.locator(".qx-tools")).toHaveText("sort relevant ⌄ · view quotes");
+  const colorOf = (selector) =>
+    page.locator(selector).first().evaluate((node) => getComputedStyle(node).color);
+  expect(await colorOf('[data-qx-detail-actions] [data-qx-action="reply"]')).toBe("rgb(154, 154, 154)");
+  expect(await colorOf('[data-qx-detail-actions] [data-qx-action="like"]')).toBe("rgb(255, 255, 255)");
+
+  await page.mouse.move(8, 8);
+  await page.screenshot({ path: path.join(SHOTS, "detail.png") });
+
+  await page.evaluate(() => {
+    document.querySelector('[data-testid="replySort"]').remove();
+    document.querySelector('a[href*="/quotes"]').remove();
+    document.querySelector(".qx-tools").remove();
+  });
+  await page.evaluate(() => {
+    const quotes = document.createElement("a");
+    quotes.href = "/bot/status/2119780776095121848/quotes";
+    quotes.textContent = "Quotes";
+    document.querySelector('[data-testid="primaryColumn"]').append(quotes);
+  });
+  await expect(page.locator(".qx-tools")).toHaveText("view quotes");
   await expect(page.getByText("> post your reply", { exact: true })).toBeVisible();
   await expect(page.locator('[data-testid="sidebarColumn"]')).toBeHidden();
 
@@ -208,7 +248,6 @@ test("detail route matches the post page", async () => {
 
   const reply = page.locator("article", { hasText: "never want to talk to another human" });
   await expect(reply.locator(".qx-metrics")).toHaveText("317 likes · 7 reposts · 45 replies");
-  await page.screenshot({ path: path.join(SHOTS, "detail.png") });
   await page.close();
 });
 

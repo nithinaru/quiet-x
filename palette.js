@@ -162,7 +162,8 @@
   // pixels inside cards are content, not chrome (SPEC: only round the container).
   const MEDIA =
     ':is([data-testid="tweetPhoto"], [data-testid="videoPlayer"], [data-testid="videoComponent"], [data-testid="card.wrapper"])';
-  const NOT_MEDIA = `:not(${MEDIA}):not(${MEDIA} *)`;
+  // Our own controls ([data-quiet-x-ui]) are painted by styles.css, never remapped.
+  const NOT_MEDIA = `:not(${MEDIA}):not(${MEDIA} *):not([data-quiet-x-ui]):not([data-quiet-x-ui] *)`;
 
   function scope(selectorText) {
     return splitSelectors(selectorText)
