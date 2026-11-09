@@ -345,7 +345,34 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
     }
     article.querySelectorAll(`[${UI}]`).forEach((node) => node.remove());
     article.setAttribute("data-qx", mode);
+    inlinePinned(article);
     buildTimeline(article);
+  }
+
+  function inlinePinned(article) {
+    const contexts = [...article.querySelectorAll('[data-testid="socialContext"]')];
+    const pinned = contexts.find((node) => /pinned/i.test(node.textContent));
+    if (!pinned) return;
+    pinned.classList.add("qx-clip");
+    const name = article.querySelector('[data-testid="User-Name"]');
+    if (!name || /pinned/i.test(name.textContent) || name.querySelector("[data-qx-pinned]")) return;
+    const handleRow = name.children[1] || name;
+    const time = handleRow.querySelector("time");
+    const anchor = time ? time.closest("a") || time : null;
+    const word = document.createElement("span");
+    word.className = "qx-pinned";
+    word.setAttribute(UI, "");
+    word.dataset.qxPinned = "1";
+    word.textContent = "pinned";
+    const dot = document.createElement("span");
+    dot.setAttribute(UI, "");
+    dot.textContent = " · ";
+    if (anchor) {
+      handleRow.insertBefore(word, anchor);
+      handleRow.insertBefore(dot, anchor);
+    } else {
+      handleRow.append(dot, word);
+    }
   }
 
   function buildTimeline(article) {
