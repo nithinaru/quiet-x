@@ -2,5 +2,17 @@
   "manifest_version": 3,
   "name": "quiet-x",
   "version": "0.1.0",
-  "description": "Restyle X into a minimal, text-only, black-and-white reading view."
+  "description": "Restyle X into a minimal, text-only, black-and-white reading view.",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://x.com/*",
+        "https://twitter.com/*",
+        "https://mobile.x.com/*"
+      ],
+      "css": ["styles.css"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ]
 }

@@ -1,0 +1,42 @@
+/* Design tokens. Change these, not the rules below. */
+:root {
+  --qx-bg: #000000;
+  --qx-fg: #ffffff;
+  --qx-muted: #9a9a9a;
+  --qx-nav: #d4d4d4;
+  --qx-faint: #7a7a7a;
+  --qx-hairline: #2a2a2a;
+  --qx-font: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --qx-nav-size: 15px;
+  --qx-body-size: 15.5px;
+  --qx-meta-size: 13.5px;
+  --qx-nav-width: 220px;
+  --qx-feed-width: 640px;
+  --qx-column-gap: 64px;
+  --qx-radius: 12px;
+  --qx-avatar: 40px;
+  --qx-post-pad-y: 28px;
+  --qx-line: 1.45;
+}
+
+html.quiet-x {
+  background: var(--qx-bg) !important;
+  color: var(--qx-fg) !important;
+  color-scheme: dark;
+  font-family: var(--qx-font) !important;
+  scrollbar-color: #2a2a2a transparent;
+}
+
+html.quiet-x body {
+  background: var(--qx-bg) !important;
+  color: var(--qx-fg) !important;
+  font-family: var(--qx-font) !important;
+  font-size: var(--qx-body-size) !important;
+  line-height: var(--qx-line);
+  letter-spacing: -0.011em;
+}
+
+html.quiet-x ::selection {
+  background: #fff;
+  color: #000;
+}
