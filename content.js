@@ -671,15 +671,25 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
     }
   }
 
+  function findGroup(article) {
+    const native = article.querySelector(
+      '[data-testid="reply"], [data-testid="like"], [data-testid="unlike"], [data-testid="retweet"], [data-testid="unretweet"]',
+    );
+    const group = native?.closest('[role="group"]');
+    if (group && article.contains(group)) return group;
+    const groups = article.querySelectorAll('[role="group"]');
+    return groups[groups.length - 1] || null;
+  }
+
   function clipGroup(article) {
-    const group = article.querySelector('[role="group"]');
+    const group = findGroup(article);
     if (!group) return;
     group.classList.add("qx-clip");
     group.setAttribute("aria-hidden", "true");
   }
 
   function insertBeforeGroup(article, node) {
-    const group = article.querySelector('[role="group"]');
+    const group = findGroup(article);
     if (group?.parentElement) group.parentElement.insertBefore(node, group);
     else article.append(node);
   }
