@@ -45,6 +45,10 @@ html.quiet-x .qx-clip {
   display: none !important;
 }
 
+html.quiet-x[data-qx-promoted="hide"] article[data-qx-promoted="1"] {
+  display: none !important;
+}
+
 html.quiet-x #react-root,
 html.quiet-x #react-root > div,
 html.quiet-x main[role="main"],

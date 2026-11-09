@@ -341,6 +341,14 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
     return [...root.querySelectorAll('article[data-testid="tweet"]')];
   }
 
+  function isPromoted(article) {
+    if (article.querySelector('[data-testid="placementTracking"]')) return true;
+    if (article.closest('[data-testid="placementTracking"]')) return true;
+    return [...article.querySelectorAll('[data-testid="socialContext"]')].some((node) =>
+      /promoted|sponsored|^ad$/i.test(node.textContent.trim()),
+    );
+  }
+
   function isDetailArticle(article) {
     if (!isStatusRoute()) return false;
     const primary = article.closest('[data-testid="primaryColumn"]') || document;
@@ -351,6 +359,12 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
   }
 
   function transformArticle(article) {
+    if (isPromoted(article)) {
+      article.dataset.qxPromoted = "1";
+      if (document.documentElement.dataset.qxPromoted !== "show") return;
+    } else {
+      delete article.dataset.qxPromoted;
+    }
     const mode = isDetailArticle(article) ? "detail" : "timeline";
     if (article.getAttribute("data-qx") === mode) {
       refreshArticle(article);
