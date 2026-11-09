@@ -144,6 +144,9 @@ Order:
 8. write, hint `n` → click `[data-testid="SideNav_NewTweet_Button"]`
 9. search, hint `/` → click the explore link. The sidebar search field is `display: none`, so it cannot be focused. Moving that React input is fragile; explore is the reliable search surface. The `/` hint is visual. Do not steal the `/` or `n` keys; X's own shortcuts should keep working
 10. tone, value on the right
+11. theme, value on the right (`dark` or `light`). Clicking flips it and saves `theme`
+
+The hairline doubles as the secret way back to regular X: a triple-click sets `enabled` to false and tears the restyle down. The toolbar icon or the options page turns it back on. Nothing on the page advertises this.
 
 Active item: white label. Inactive: `--qx-nav`. No pill, no icon.
 
@@ -256,7 +259,9 @@ Using X's own nodes, not a second profile renderer:
 ```
 manifest.json      MV3, content script on x.com, twitter.com, and the fixture host
 content.js         DOM adapter. Isolated world. No MAIN-world injection
-styles.css         Tokens and every visual rule, scoped to html.quiet-x
+styles.css         Tokens (dark and light) and the timeline, profile, detail, and nav rules
+pages.css          Explore, search, notifications, chat, settings, lists, dialogs, buttons
+palette.js         Remaps X's own atomic-class colors onto the tokens at runtime
 background.js      Toolbar toggle, badge, webNavigation route pings
 options.html       M5 settings
 options.js
@@ -290,6 +295,7 @@ Ignore mutations that only happen inside `[data-quiet-x-ui]` by being idempotent
 | `enabled` | `true` | Class `quiet-x`, observer, injected UI |
 | `hidePromoted` | `true` | `html[data-qx-promoted="hide"]` hides `article[data-qx-promoted="1"]` |
 | `font` | `inter` | `html[data-qx-font="system"]` switches the font variable |
+| `theme` | `dark` | `dark`, `light`, or `system`. Sets `html[data-qx-theme]` to `dark` or `light`; the light token block in `styles.css` swaps the colors |
 
 The toolbar icon toggles `enabled`. The options page edits all three. `chrome.storage.onChanged` applies them without a reload.
 
@@ -361,6 +367,12 @@ Isolated world only. No `eval`, no remote script, no MAIN-world injection. Text 
 - `manifest.json` — content script CSS and JS at `document_start`; `storage` and `webNavigation`; host permissions for x.com, twitter.com, and `http://127.0.0.1/*`; `options_ui`; toolbar action with no popup (click toggles).
 - `http://127.0.0.1/*` is for the test server only. The script ignores other ports.
 - Fonts are listed in `web_accessible_resources` so the content-script stylesheet can load them.
+
+## Theme and palette
+
+X paints most of its UI with generated atomic classes (`.r-xxxx{color:...}`). Those names change between builds, so `palette.js` never hardcodes them. On each scan it walks the same-origin stylesheets incrementally, finds rules whose `color`, `background-color`, border colors, `fill`, or `stroke` belong to X's palette (all three X themes), and writes `html.quiet-x <same selector> { prop: token !important }` into `<style id="qx-palette">`. X blue and accent colors become `--qx-fg`, X grays become `--qx-muted`, surfaces and hover washes become transparent, dividers become transparent. Media containers (`tweetPhoto`, `videoPlayer`, `videoComponent`, `card.wrapper`) and our own `[data-quiet-x-ui]` nodes are excluded, so captions, duration chips, and our controls keep their colors. Turning the extension off clears the sheet.
+
+`content.js` sets `html[data-qx-page]` on each route (`home`, `explore`, `search`, `notifications`, `chat`, `settings`, `bookmarks`, `lists`, `profile`, `status`, `other`) so `pages.css` can scope page rules. Several selectors in `pages.css` are unverified against logged-in X; the file's comments mark them.
 
 ## Milestones
 
