@@ -7,7 +7,11 @@
   "host_permissions": [
     "https://x.com/*",
     "https://twitter.com/*",
-    "https://mobile.x.com/*"
+    "https://mobile.x.com/*",
+    "http://127.0.0.1/*",
+    "http://127.0.0.1:8765/*",
+    "http://localhost/*",
+    "http://localhost:8765/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -24,7 +28,11 @@
       "matches": [
         "https://x.com/*",
         "https://twitter.com/*",
-        "https://mobile.x.com/*"
+        "https://mobile.x.com/*",
+        "http://127.0.0.1/*",
+        "http://127.0.0.1:8765/*",
+        "http://localhost/*",
+        "http://localhost:8765/*"
       ],
       "css": ["styles.css"],
       "js": ["content.js"],
@@ -37,7 +45,11 @@
       "matches": [
         "https://x.com/*",
         "https://twitter.com/*",
-        "https://mobile.x.com/*"
+        "https://mobile.x.com/*",
+        "http://127.0.0.1/*",
+        "http://127.0.0.1:8765/*",
+        "http://localhost/*",
+        "http://localhost:8765/*"
       ]
     }
   ]
