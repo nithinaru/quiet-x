@@ -121,6 +121,7 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
       refreshCounts();
       updateNavActive();
       hideHomeComposer();
+      for (const article of articles()) transformArticle(article);
       if (document.readyState !== "loading") {
         document.documentElement.dataset.qxReady = "1";
       }
@@ -328,6 +329,96 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
     }
     if (node.getAttribute("data-testid") === "primaryColumn") return;
     if (!node.querySelector("article[data-testid='tweet']")) node.classList.add("qx-clip");
+  }
+
+  function articles() {
+    const primary = document.querySelector('[data-testid="primaryColumn"]');
+    const root = primary || document.body;
+    return [...root.querySelectorAll('article[data-testid="tweet"]')];
+  }
+
+  function transformArticle(article) {
+    const mode = "timeline";
+    if (article.getAttribute("data-qx") === mode) {
+      refreshArticle(article);
+      return;
+    }
+    article.querySelectorAll(`[${UI}]`).forEach((node) => node.remove());
+    article.setAttribute("data-qx", mode);
+    buildTimeline(article);
+  }
+
+  function buildTimeline(article) {
+    const bar = document.createElement("div");
+    bar.className = "qx-bar";
+    bar.setAttribute(UI, "");
+    const metrics = document.createElement("p");
+    metrics.className = "qx-metrics";
+    metrics.setAttribute(UI, "");
+    metrics.textContent = metricsLine(article);
+    bar.append(metrics);
+    clipGroup(article);
+    insertBeforeGroup(article, bar);
+  }
+
+  function findNative(article, kind) {
+    const ids = {
+      reply: ["reply"],
+      repost: ["retweet", "unretweet"],
+      like: ["like", "unlike"],
+      keep: ["bookmark", "removeBookmark"],
+      share: ["share"],
+    }[kind];
+    if (!ids) return null;
+    for (const id of ids) {
+      const found = article.querySelector(`[data-testid="${id}"]`);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  function visibleCount(button) {
+    if (!button) return "";
+    for (const span of button.querySelectorAll("span")) {
+      const text = span.textContent.trim();
+      if (/^[\d.,]+[KMB]?$/i.test(text)) return text;
+    }
+    const label = button.getAttribute("aria-label") || "";
+    const match = label.match(/([\d.,]+)\s*([KMB])?/i);
+    if (!match) return "";
+    return `${match[1]}${(match[2] || "").toUpperCase()}`;
+  }
+
+  function metricsLine(article) {
+    const parts = [];
+    const likes = visibleCount(findNative(article, "like"));
+    const reposts = visibleCount(findNative(article, "repost"));
+    const replies = visibleCount(findNative(article, "reply"));
+    if (likes) parts.push(`${likes} likes`);
+    if (reposts) parts.push(`${reposts} reposts`);
+    if (replies) parts.push(`${replies} replies`);
+    return parts.join(" · ");
+  }
+
+  function refreshArticle(article) {
+    const metrics = article.querySelector(".qx-metrics");
+    if (metrics) {
+      const next = metricsLine(article);
+      if (metrics.textContent !== next) metrics.textContent = next;
+    }
+  }
+
+  function clipGroup(article) {
+    const group = article.querySelector('[role="group"]');
+    if (!group) return;
+    group.classList.add("qx-clip");
+    group.setAttribute("aria-hidden", "true");
+  }
+
+  function insertBeforeGroup(article, node) {
+    const group = article.querySelector('[role="group"]');
+    if (group?.parentElement) group.parentElement.insertBefore(node, group);
+    else article.append(node);
   }
 
 function init() {
