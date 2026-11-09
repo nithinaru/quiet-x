@@ -1,0 +1,13 @@
+{
+  "name": "quiet-x",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Minimal text-only black-and-white Chrome extension for X.",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
+  }
+}
