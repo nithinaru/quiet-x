@@ -393,6 +393,61 @@ html.quiet-x .qx-meta strong {
   font-weight: 600;
 }
 
+html.quiet-x .qx-actions,
+html.quiet-x .qx-tools {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+}
+
+html.quiet-x .qx-actions {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+html.quiet-x article[data-testid="tweet"]:hover .qx-actions,
+html.quiet-x article[data-testid="tweet"]:focus-within .qx-actions,
+html.quiet-x .qx-bar.is-detail .qx-actions {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+html.quiet-x .qx-action,
+html.quiet-x .qx-tool,
+html.quiet-x .qx-send,
+html.quiet-x .qx-sep {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: var(--qx-muted);
+  font: inherit;
+  font-size: var(--qx-meta-size);
+  line-height: 1.4;
+  cursor: pointer;
+  text-transform: lowercase;
+}
+
+html.quiet-x .qx-sep {
+  cursor: default;
+  white-space: pre;
+}
+
+html.quiet-x .qx-action.is-on,
+html.quiet-x .qx-action.is-on:hover {
+  color: var(--qx-fg);
+}
+
+html.quiet-x .qx-nav-item:focus-visible,
+html.quiet-x .qx-action:focus-visible,
+html.quiet-x .qx-tool:focus-visible,
+html.quiet-x .qx-back:focus-visible,
+html.quiet-x .qx-send:focus-visible {
+  outline: 1px solid #fff;
+  outline-offset: 3px;
+}
+
 @media (max-width: 860px) {
   html.quiet-x .qx-shell {
     flex-direction: column !important;

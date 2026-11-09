@@ -30,6 +30,8 @@
     { key: "profile", label: "profile", testids: ["AppTabBar_Profile_Link"], hrefs: [] },
   ];
 
+  const ACTION_KINDS = ["reply", "repost", "like", "keep", "share"];
+
   let running = false;
   let observer = null;
   let scheduled = false;
@@ -383,9 +385,73 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
     metrics.className = "qx-metrics";
     metrics.setAttribute(UI, "");
     metrics.textContent = metricsLine(article);
-    bar.append(metrics);
+    bar.append(metrics, buildActions(article, false));
     clipGroup(article);
     insertBeforeGroup(article, bar);
+  }
+
+  function buildActions(article, withCount) {
+    const group = document.createElement("div");
+    group.className = "qx-actions";
+    group.setAttribute(UI, "");
+    group.setAttribute("role", "group");
+    group.setAttribute("aria-label", "Post actions");
+    ACTION_KINDS.forEach((kind, index) => {
+      if (index > 0) {
+        const sep = document.createElement("span");
+        sep.className = "qx-sep";
+        sep.setAttribute(UI, "");
+        sep.setAttribute("aria-hidden", "true");
+        sep.textContent = " · ";
+        group.append(sep);
+      }
+      group.append(makeActionButton(article, kind, withCount));
+    });
+    return group;
+  }
+
+  function makeActionButton(article, kind, withCount) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "qx-action";
+    button.dataset.qxAction = kind;
+    button.setAttribute(UI, "");
+    paintAction(button, article, kind, withCount);
+    return button;
+  }
+
+  function paintAction(button, article, kind, withCount) {
+    const native = findNative(article, kind);
+    const text = buttonLabel(kind, native, withCount);
+    if (button.textContent !== text) button.textContent = text;
+    const on = isOn(kind, native);
+    button.classList.toggle("is-on", on);
+    if (kind === "like" || kind === "keep" || kind === "repost") {
+      button.setAttribute("aria-pressed", on ? "true" : "false");
+    }
+    button.setAttribute("aria-label", text);
+  }
+
+  function buttonLabel(kind, native, withCount) {
+    const word = actionWord(kind, native);
+    const count = visibleCount(native);
+    if (withCount && count && kind !== "share") return `${word} ${count}`;
+    return word;
+  }
+
+  function actionWord(kind, native) {
+    if (kind === "like") return isOn("like", native) ? "liked" : "like";
+    if (kind === "keep") return isOn("keep", native) ? "kept" : "keep";
+    if (kind === "repost") return isOn("repost", native) ? "reposted" : "repost";
+    return kind;
+  }
+
+  function isOn(kind, native) {
+    const id = native?.getAttribute("data-testid") || "";
+    if (kind === "like") return id === "unlike";
+    if (kind === "keep") return id === "removeBookmark";
+    if (kind === "repost") return id === "unretweet";
+    return false;
   }
 
   function findNative(article, kind) {
@@ -432,6 +498,11 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
     if (metrics) {
       const next = metricsLine(article);
       if (metrics.textContent !== next) metrics.textContent = next;
+    }
+    const withCount = article.getAttribute("data-qx") === "detail";
+    for (const kind of ACTION_KINDS) {
+      const button = article.querySelector(`[data-qx-action="${kind}"]`);
+      if (button) paintAction(button, article, kind, withCount);
     }
   }
 
