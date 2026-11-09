@@ -19,6 +19,10 @@
   --qx-line: 1.45;
 }
 
+html.quiet-x[data-qx-font="system"] {
+  --qx-font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
 html.quiet-x {
   background: var(--qx-bg) !important;
   color: var(--qx-fg) !important;

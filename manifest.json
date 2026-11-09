@@ -14,5 +14,15 @@
       "js": ["content.js"],
       "run_at": "document_start"
     }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["fonts/*"],
+      "matches": [
+        "https://x.com/*",
+        "https://twitter.com/*",
+        "https://mobile.x.com/*"
+      ]
+    }
   ]
 }

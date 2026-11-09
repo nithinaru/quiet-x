@@ -56,8 +56,20 @@
     return false;
   }
 
+function installFonts() {
+  if (document.getElementById("qx-fonts")) return;
+  if (!chrome?.runtime?.getURL) return;
+  const face = (weight, file) =>
+    `@font-face{font-family:"Inter";src:url("${chrome.runtime.getURL(file)}") format("woff2");font-weight:${weight};font-style:normal;font-display:swap;}`;
+  const style = document.createElement("style");
+  style.id = "qx-fonts";
+  style.textContent = [face(400, "fonts/inter-400.woff2"), face(500, "fonts/inter-500.woff2"), face(600, "fonts/inter-600.woff2")].join("");
+  document.documentElement.append(style);
+}
+
 function start() {
   document.documentElement.classList.add("quiet-x");
+  installFonts();
     if (!routePoll) {
       routePoll = window.setInterval(() => {
         if (running && location.pathname !== currentPath) scan();
