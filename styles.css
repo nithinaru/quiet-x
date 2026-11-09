@@ -218,7 +218,6 @@ html.quiet-x a[href$="/followers"] > span:first-child,
 html.quiet-x a[href$="/verified_followers"] > span:first-child {
   color: var(--qx-fg) !important;
   font-weight: 600;
-  margin-right: 4px;
 }
 
 html.quiet-x [data-testid="UserProfileHeader_SocialContext"] {
@@ -232,8 +231,16 @@ html.quiet-x [data-testid="UserProfileHeader_SocialContext"] img {
   width: 20px !important;
   height: 20px !important;
   border-radius: 50% !important;
-  margin-right: -6px;
+  margin: 0;
   vertical-align: middle;
+}
+
+html.quiet-x [data-testid="UserProfileHeader_SocialContext"] img + img {
+  margin-left: -6px;
+}
+
+html.quiet-x [data-testid="UserProfileHeader_SocialContext"] img:last-of-type {
+  margin-right: 8px;
 }
 
 html.quiet-x [role="tablist"] {
