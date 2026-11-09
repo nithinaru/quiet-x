@@ -224,13 +224,20 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
       const found = document.querySelector(`[data-testid="${id}"]`);
       if (found) return found;
     }
-    if (item.hrefs?.length) {
-      for (const link of document.querySelectorAll("a[href]")) {
+    const nav = findNav();
+    const scope = nav?.closest("header") || nav || document.querySelector('header[role="banner"]');
+    if (item.hrefs?.length && scope) {
+      for (const link of scope.querySelectorAll("a[href]")) {
         const href = link.getAttribute("href") || "";
         if (item.hrefs.some((part) => hrefMatches(href, part))) return link;
       }
     }
-    if (item.key === "profile") return document.querySelector('a[aria-label="Profile"]');
+    if (item.key === "profile") {
+      return (scope || document).querySelector('a[aria-label="Profile"]');
+    }
+    if (item.key === "bookmarks") {
+      return document.querySelector('a[href="/i/bookmarks"]');
+    }
     return null;
   }
 
@@ -297,7 +304,9 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
 
   function navButton(item) {
     return rowButton(item.key, item.label, "", () => {
-      findLink(item)?.click();
+      const link = findLink(item);
+      if (link) link.click();
+      else if (item.hrefs[0]) location.assign(item.hrefs[0]);
     });
   }
 
