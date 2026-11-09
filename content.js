@@ -40,6 +40,7 @@
   let routePoll = 0;
   let toneTimer = 0;
   let hooked = false;
+  const toneStarted = Date.now();
 
   function allowedHost() {
     const host = location.hostname;
@@ -304,9 +305,9 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
     window.clearInterval(toneTimer);
     toneTimer = 0;
     const frozen = new URLSearchParams(location.search).get("qx-tone");
-    const started = Date.now();
     const paint = () => {
-      node.textContent = frozen || formatElapsed(Date.now() - started);
+      const next = frozen || formatElapsed(Date.now() - toneStarted);
+      if (node.textContent !== next) node.textContent = next;
     };
     paint();
     if (!frozen) toneTimer = window.setInterval(paint, 1000);
