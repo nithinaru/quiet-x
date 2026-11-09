@@ -167,6 +167,92 @@ html.quiet-x .qx-nav-divider {
   border: 0;
 }
 
+html.quiet-x .qx-back {
+  display: inline-flex;
+  margin: 8px 0 18px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: var(--qx-fg);
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+html.quiet-x [data-testid="UserName"] {
+  display: inline !important;
+  color: var(--qx-fg) !important;
+  font-size: 20px !important;
+  font-weight: 600 !important;
+}
+
+html.quiet-x [data-testid="UserJoinDate"] {
+  display: inline !important;
+  margin-left: 8px;
+  color: var(--qx-muted) !important;
+  font-size: 15px !important;
+  text-transform: lowercase;
+}
+
+html.quiet-x a[href$="/following"],
+html.quiet-x a[href$="/followers"],
+html.quiet-x a[href$="/verified_followers"] {
+  display: inline-block;
+  margin: 14px 18px 0 0;
+  color: var(--qx-muted) !important;
+  font-size: 15px !important;
+  text-decoration: none !important;
+  text-transform: lowercase;
+}
+
+html.quiet-x a[href$="/following"] > span:first-child,
+html.quiet-x a[href$="/followers"] > span:first-child,
+html.quiet-x a[href$="/verified_followers"] > span:first-child {
+  color: var(--qx-fg) !important;
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+html.quiet-x [data-testid="UserProfileHeader_SocialContext"] {
+  margin: 14px 0 4px;
+  color: var(--qx-muted) !important;
+  font-size: 14px;
+  text-transform: lowercase;
+}
+
+html.quiet-x [data-testid="UserProfileHeader_SocialContext"] img {
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 50% !important;
+  margin-right: -6px;
+  vertical-align: middle;
+}
+
+html.quiet-x [role="tablist"] {
+  display: flex !important;
+  gap: 28px !important;
+  margin: 22px 0 6px !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+html.quiet-x [role="tab"] {
+  margin: 0 !important;
+  padding: 12px 0 !important;
+  background: transparent !important;
+  color: var(--qx-muted) !important;
+  font: inherit !important;
+  font-size: 15px !important;
+  text-decoration: none !important;
+  text-transform: lowercase;
+  box-shadow: none !important;
+}
+
+html.quiet-x [role="tab"][aria-selected="true"] {
+  color: var(--qx-fg) !important;
+  box-shadow: inset 0 -1px 0 #fff !important;
+}
+
 @media (max-width: 860px) {
   html.quiet-x .qx-shell {
     flex-direction: column !important;
