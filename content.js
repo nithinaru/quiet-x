@@ -341,6 +341,7 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
       let slot = parent.querySelector(".qx-nav-count");
       if (!value) {
         slot?.remove();
+        parent.removeAttribute("aria-label");
         continue;
       }
       if (!slot) {
