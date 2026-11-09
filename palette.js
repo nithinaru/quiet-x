@@ -158,12 +158,20 @@
     return parts.map((s) => s.trim()).filter(Boolean);
   }
 
+  // Media keeps X's own colors: duration chips, captions over video, and the
+  // pixels inside cards are content, not chrome (SPEC: only round the container).
+  const MEDIA =
+    ':is([data-testid="tweetPhoto"], [data-testid="videoPlayer"], [data-testid="videoComponent"], [data-testid="card.wrapper"])';
+  const NOT_MEDIA = `:not(${MEDIA}):not(${MEDIA} *)`;
+
   function scope(selectorText) {
     return splitSelectors(selectorText)
       .map((sel) => {
+        // A pseudo-element must stay last, so those rules are left unguarded.
+        const guarded = sel.includes("::") ? sel : sel + NOT_MEDIA;
         // `html`/`:root` selectors target the root itself, so qualify rather than nest.
         const m = /^(html|:root)(?![\w-])/i.exec(sel);
-        return m ? "html.quiet-x" + sel.slice(m[0].length) : "html.quiet-x " + sel;
+        return m ? "html.quiet-x" + guarded.slice(m[0].length) : "html.quiet-x " + guarded;
       })
       .join(", ");
   }

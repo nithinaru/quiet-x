@@ -78,6 +78,7 @@ test("restyles the timeline and the detail view", async () => {
     "write",
     "search",
     "tone",
+    "theme",
   ]);
   await expect(page.locator('[data-qx-nav="notifications"] .qx-nav-count')).toHaveText("3");
   await expect(page.locator('[data-qx-nav="chat"] .qx-nav-count')).toHaveText("4");
@@ -131,6 +132,17 @@ test("restyles the timeline and the detail view", async () => {
 
   await page.locator('[data-qx-nav="write"]').click();
   await expect(page.locator('[data-testid="SideNav_NewTweet_Button"]')).toHaveAttribute("data-clicks", "1");
+
+  await expect(page.locator('[data-qx-nav="theme"] .qx-nav-hint')).toHaveText("dark");
+  await page.locator('[data-qx-nav="theme"]').click();
+  await expect(page.locator("html")).toHaveAttribute("data-qx-theme", "light");
+  await expect(page.locator('[data-qx-nav="theme"] .qx-nav-hint')).toHaveText("light");
+  await expect
+    .poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor))
+    .toBe("rgb(255, 255, 255)");
+  await page.screenshot({ path: path.join(SHOTS, "light.png") });
+  await page.locator('[data-qx-nav="theme"]').click();
+  await expect(page.locator("html")).toHaveAttribute("data-qx-theme", "dark");
 
   await page.close();
 });

@@ -1,4 +1,4 @@
-const DEFAULTS = { enabled: true, hidePromoted: true, font: "inter" };
+const DEFAULTS = { enabled: true, hidePromoted: true, font: "inter", theme: "dark" };
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.storage.local.get(DEFAULTS, (data) => {

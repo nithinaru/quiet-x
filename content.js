@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const DEFAULTS = { enabled: true, hidePromoted: true, font: "inter" };
+  const DEFAULTS = { enabled: true, hidePromoted: true, font: "inter", theme: "dark" };
   const UI = "data-quiet-x-ui";
   const FIXTURE_PORT = "8765";
 
@@ -74,16 +74,25 @@
     }
   }
 
+  function storageSet(values) {
+    try {
+      chrome.storage?.local?.set(values);
+    } catch {
+      /* opened outside the extension */
+    }
+  }
+
   function hookRuntime() {
     if (hooked) return;
     hooked = true;
+    systemLight?.addEventListener?.("change", paintTheme);
     try {
       chrome.runtime?.onMessage.addListener((message) => {
         if (message?.type === "qx-route" && running) scan();
       });
       chrome.storage?.onChanged.addListener((changes, area) => {
         if (area !== "local") return;
-        if (!changes.enabled && !changes.font && !changes.hidePromoted) return;
+        if (!changes.enabled && !changes.font && !changes.hidePromoted && !changes.theme) return;
         storageGet(DEFAULTS, applySettings);
       });
     } catch {
@@ -91,8 +100,26 @@
     }
   }
 
+  let themeSetting = DEFAULTS.theme;
+  const systemLight = window.matchMedia?.("(prefers-color-scheme: light)");
+
+  function resolvedTheme() {
+    if (themeSetting === "light") return "light";
+    if (themeSetting === "system") return systemLight?.matches ? "light" : "dark";
+    return "dark";
+  }
+
+  function paintTheme() {
+    const theme = resolvedTheme();
+    document.documentElement.dataset.qxTheme = theme;
+    const value = document.querySelector('[data-qx-nav="theme"] .qx-nav-hint');
+    if (value && value.textContent !== theme) value.textContent = theme;
+  }
+
   function applySettings(data) {
     const root = document.documentElement;
+    themeSetting = ["light", "system"].includes(data.theme) ? data.theme : "dark";
+    paintTheme();
     root.dataset.qxFont = data.font === "system" ? "system" : "inter";
     root.dataset.qxPromoted = data.hidePromoted === false ? "show" : "hide";
     if (data.enabled === false) stop();
@@ -299,6 +326,14 @@
       hint.className = "qx-nav-hint";
       tone.append(hint);
       list.append(tone);
+      list.append(
+        rowButton("theme", "theme", resolvedTheme(), () => {
+          const next = resolvedTheme() === "dark" ? "light" : "dark";
+          themeSetting = next;
+          paintTheme();
+          storageSet({ theme: next });
+        }),
+      );
       nav.append(list);
       startTone(hint);
     }

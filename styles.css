@@ -18,6 +18,18 @@
   --qx-avatar: 40px;
   --qx-post-pad-y: 28px;
   --qx-line: 1.45;
+  --qx-scheme: dark;
+}
+
+/* Light theme: same roles, inverted. Muted and faint stay AA on white. */
+:root[data-qx-theme="light"] {
+  --qx-bg: #ffffff;
+  --qx-fg: #000000;
+  --qx-muted: #5f5f5f;
+  --qx-nav: #2b2b2b;
+  --qx-faint: #767676;
+  --qx-hairline: #e4e4e4;
+  --qx-scheme: light;
 }
 
 html.quiet-x[data-qx-font="system"] {
@@ -27,9 +39,9 @@ html.quiet-x[data-qx-font="system"] {
 html.quiet-x {
   background: var(--qx-bg) !important;
   color: var(--qx-fg) !important;
-  color-scheme: dark;
+  color-scheme: var(--qx-scheme);
   font-family: var(--qx-font) !important;
-  scrollbar-color: #2a2a2a transparent;
+  scrollbar-color: var(--qx-hairline) transparent;
 }
 
 html.quiet-x body {
@@ -42,8 +54,8 @@ html.quiet-x body {
 }
 
 html.quiet-x ::selection {
-  background: #fff;
-  color: #000;
+  background: var(--qx-fg);
+  color: var(--qx-bg);
 }
 
 html.quiet-x .qx-clip {
@@ -266,7 +278,7 @@ html.quiet-x [role="tab"] {
 
 html.quiet-x [role="tab"][aria-selected="true"] {
   color: var(--qx-fg) !important;
-  box-shadow: inset 0 -1px 0 #fff !important;
+  box-shadow: inset 0 -1px 0 var(--qx-fg) !important;
 }
 
 html.quiet-x article[data-testid="tweet"] {
@@ -538,7 +550,7 @@ html.quiet-x .qx-action:focus-visible,
 html.quiet-x .qx-tool:focus-visible,
 html.quiet-x .qx-back:focus-visible,
 html.quiet-x .qx-send:focus-visible {
-  outline: 1px solid #fff;
+  outline: 1px solid var(--qx-fg);
   outline-offset: 3px;
 }
 
