@@ -417,6 +417,16 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
     button.dataset.qxAction = kind;
     button.setAttribute(UI, "");
     paintAction(button, article, kind, withCount);
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const native = findNative(article, kind);
+      if (!native) return;
+      native.click();
+      refreshArticle(article);
+      window.setTimeout(() => refreshArticle(article), 80);
+      window.setTimeout(() => refreshArticle(article), 400);
+    });
     return button;
   }
 
