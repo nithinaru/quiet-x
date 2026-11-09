@@ -99,20 +99,24 @@
     else start();
   }
 
-function installFonts() {
-  if (document.getElementById("qx-fonts")) return;
-  if (!chrome?.runtime?.getURL) return;
-  const face = (weight, file) =>
-    `@font-face{font-family:"Inter";src:url("${chrome.runtime.getURL(file)}") format("woff2");font-weight:${weight};font-style:normal;font-display:swap;}`;
-  const style = document.createElement("style");
-  style.id = "qx-fonts";
-  style.textContent = [face(400, "fonts/inter-400.woff2"), face(500, "fonts/inter-500.woff2"), face(600, "fonts/inter-600.woff2")].join("");
-  document.documentElement.append(style);
-}
+  function installFonts() {
+    if (document.getElementById("qx-fonts")) return;
+    if (!chrome?.runtime?.getURL) return;
+    const face = (weight, file) =>
+      `@font-face{font-family:"Inter";src:url("${chrome.runtime.getURL(file)}") format("woff2");font-weight:${weight};font-style:normal;font-display:swap;}`;
+    const style = document.createElement("style");
+    style.id = "qx-fonts";
+    style.textContent = [
+      face(400, "fonts/inter-400.woff2"),
+      face(500, "fonts/inter-500.woff2"),
+      face(600, "fonts/inter-600.woff2"),
+    ].join("");
+    document.documentElement.append(style);
+  }
 
-function start() {
-  document.documentElement.classList.add("quiet-x");
-  installFonts();
+  function start() {
+    document.documentElement.classList.add("quiet-x");
+    installFonts();
     if (!routePoll) {
       routePoll = window.setInterval(() => {
         if (running && location.pathname !== currentPath) scan();
@@ -146,9 +150,16 @@ function start() {
     document.documentElement.classList.remove("quiet-x");
     delete document.documentElement.dataset.qxReady;
     document.querySelectorAll(`[${UI}]`).forEach((node) => node.remove());
-document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("data-qx"));
-  document.getElementById("qx-fonts")?.remove();
-}
+    document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("data-qx"));
+    document.querySelectorAll(".qx-clip").forEach((node) => {
+      node.classList.remove("qx-clip");
+      if (node.getAttribute("role") === "group") node.removeAttribute("aria-hidden");
+    });
+    document.querySelectorAll(".qx-shell, .qx-composer").forEach((node) => {
+      node.classList.remove("qx-shell", "qx-composer");
+    });
+    document.getElementById("qx-fonts")?.remove();
+  }
 
   function scheduleScan() {
     if (!running || scheduled) return;
@@ -807,14 +818,14 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
     primary.querySelector('[data-testid="tweetButton"], [data-testid="tweetButtonInline"]')?.classList.add("qx-clip");
   }
 
-function init() {
-  if (!allowedHost()) return;
-  document.documentElement.classList.add("quiet-x");
-  document.documentElement.dataset.qxBoot = "1";
-  hookRuntime();
-  applySettings(DEFAULTS);
-  storageGet(DEFAULTS, applySettings);
-}
+  function init() {
+    if (!allowedHost()) return;
+    document.documentElement.classList.add("quiet-x");
+    document.documentElement.dataset.qxBoot = "1";
+    hookRuntime();
+    applySettings(DEFAULTS);
+    storageGet(DEFAULTS, applySettings);
+  }
 
   init();
 })();

@@ -116,6 +116,8 @@ test("restyles the timeline and the detail view", async () => {
   await expect(posts.nth(1).locator(".qx-actions")).toHaveText("reply · repost · like · keep · share");
   await page.screenshot({ path: path.join(SHOTS, "hover.png") });
 
+  await page.bringToFront();
+  await posts.nth(1).hover();
   await posts.nth(1).locator('[data-qx-action="like"]').click();
   await expect(posts.nth(1).locator('[data-testid="unlike"]')).toHaveAttribute("data-clicks", "1");
   await expect(posts.nth(1).locator('[data-qx-action="like"]')).toHaveText("liked");
