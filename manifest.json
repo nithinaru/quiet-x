@@ -34,7 +34,7 @@
         "http://localhost/*",
         "http://localhost:8765/*"
       ],
-      "css": ["styles.css"],
+      "css": ["styles.css", "pages.css"],
       "js": ["palette.js", "content.js"],
       "run_at": "document_start"
     }

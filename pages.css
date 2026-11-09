@@ -1,0 +1,1257 @@
+/*
+ * quiet-x pages.css
+ * Loaded after styles.css. Extends the timeline/nav design language to the
+ * rest of X: chrome, buttons, tabs, explore, search, notifications, chat,
+ * settings, bookmarks and lists.
+ *
+ * Rules:
+ * - Every selector is scoped under html.quiet-x.
+ * - Colors come only from the tokens in styles.css (--qx-*).
+ * - Hooks are data-testid, aria-*, role and href patterns. No generated classes.
+ * - Page scoping uses html[data-qx-page], set by content.js.
+ * - Post text, display names, DM text and user input are never lowercased.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Generic chrome                                                      */
+/* ------------------------------------------------------------------ */
+
+/* Sticky column header: opaque ground, no blur, no bottom rule. */
+html.quiet-x [data-testid="primaryColumn"] > div > div:first-child,
+html.quiet-x [data-testid="TopNavBar"] {
+  background-color: var(--qx-bg) !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+html.quiet-x [data-testid="primaryColumn"] > div > div:first-child > div {
+  background-color: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  border: 0 !important;
+}
+
+/* Header title. Profile and lists keep X's casing: their header shows a
+   display name or a user-written list name. Chat is handled in its section
+   because the conversation header holds a person's name. */
+html.quiet-x [data-testid="primaryColumn"] h2[role="heading"] {
+  color: var(--qx-fg) !important;
+  font-family: var(--qx-font) !important;
+  font-size: 17px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em;
+}
+
+html.quiet-x:is(
+    [data-qx-page="home"],
+    [data-qx-page="explore"],
+    [data-qx-page="search"],
+    [data-qx-page="notifications"],
+    [data-qx-page="settings"],
+    [data-qx-page="bookmarks"],
+    [data-qx-page="status"]
+  )
+  [data-testid="primaryColumn"]
+  h2[role="heading"] {
+  text-transform: lowercase;
+}
+
+/* Section headings inside timelines ("Today's News", "Who to follow"). */
+html.quiet-x:is(
+    [data-qx-page="home"],
+    [data-qx-page="explore"],
+    [data-qx-page="search"],
+    [data-qx-page="notifications"],
+    [data-qx-page="bookmarks"]
+  )
+  [data-testid="cellInnerDiv"]
+  h2[role="heading"] {
+  color: var(--qx-fg) !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  text-transform: lowercase;
+}
+
+/* Secondary line under a header (bookmarks @handle, "12 posts"). */
+html.quiet-x [data-testid="primaryColumn"] h2[role="heading"] + div,
+html.quiet-x [data-testid="primaryColumn"] h2[role="heading"] ~ div [dir="ltr"] {
+  color: var(--qx-muted) !important;
+  font-size: var(--qx-meta-size) !important;
+}
+
+/* Cells: no rules between them. */
+html.quiet-x [data-testid="cellInnerDiv"] > div {
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* "New posts" pill: a plain muted text button. */
+html.quiet-x [aria-label*="New posts"],
+html.quiet-x [aria-label*="new posts"] {
+  background: var(--qx-bg) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: var(--qx-muted) !important;
+  padding: 6px 0 !important;
+  min-height: 0 !important;
+}
+
+html.quiet-x [aria-label*="New posts"] *,
+html.quiet-x [aria-label*="new posts"] * {
+  background: transparent !important;
+  color: var(--qx-muted) !important;
+  font-size: var(--qx-meta-size) !important;
+  text-transform: lowercase;
+}
+
+html.quiet-x [aria-label*="New posts"] img,
+html.quiet-x [aria-label*="New posts"] svg,
+html.quiet-x [aria-label*="new posts"] img,
+html.quiet-x [aria-label*="new posts"] svg {
+  display: none !important;
+}
+
+html.quiet-x [aria-label*="New posts"]:hover *,
+html.quiet-x [aria-label*="new posts"]:hover * {
+  color: var(--qx-fg) !important;
+  text-decoration: underline;
+}
+
+/* Toasts. */
+html.quiet-x [data-testid="toast"] {
+  background: var(--qx-bg) !important;
+  border: 1px solid var(--qx-hairline) !important;
+  border-radius: var(--qx-radius) !important;
+  box-shadow: none !important;
+  color: var(--qx-fg) !important;
+}
+
+html.quiet-x [data-testid="toast"] * {
+  color: var(--qx-fg) !important;
+  font-family: var(--qx-font) !important;
+  font-size: var(--qx-meta-size) !important;
+  text-transform: lowercase;
+}
+
+html.quiet-x [data-testid="toast"] a,
+html.quiet-x [data-testid="toast"] [role="button"] {
+  text-decoration: underline !important;
+}
+
+/* Modal backdrop: a dim of the page ground instead of X's gray. */
+html.quiet-x [data-testid="mask"] {
+  background-color: color-mix(in srgb, var(--qx-bg) 82%, transparent) !important;
+}
+
+/* Modal surfaces. [role="dialog"] on X is the full-screen layer, so the
+   border goes on the panel ([aria-modal]) and sheets, not the layer. */
+html.quiet-x [aria-modal="true"],
+html.quiet-x [data-testid="sheetDialog"] {
+  background: var(--qx-bg) !important;
+  color: var(--qx-fg) !important;
+  border: 1px solid var(--qx-hairline) !important;
+  border-radius: var(--qx-radius) !important;
+  box-shadow: none !important;
+}
+
+html.quiet-x [aria-modal="true"] > div,
+html.quiet-x [data-testid="sheetDialog"] > div {
+  background: transparent !important;
+}
+
+html.quiet-x [aria-modal="true"] h1,
+html.quiet-x [aria-modal="true"] h2[role="heading"],
+html.quiet-x [aria-modal="true"] #modal-header,
+html.quiet-x [data-testid="sheetDialog"] h1 {
+  color: var(--qx-fg) !important;
+  font-family: var(--qx-font) !important;
+  font-weight: 600 !important;
+  text-transform: lowercase;
+}
+
+/* Modal close/back icons become words. */
+html.quiet-x [aria-modal="true"] [data-testid="app-bar-close"],
+html.quiet-x [aria-modal="true"] [data-testid="app-bar-back"] {
+  width: auto !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  color: var(--qx-muted) !important;
+}
+
+html.quiet-x [aria-modal="true"] [data-testid="app-bar-close"] svg,
+html.quiet-x [aria-modal="true"] [data-testid="app-bar-back"] svg {
+  display: none !important;
+}
+
+html.quiet-x [aria-modal="true"] [data-testid="app-bar-close"]::after {
+  content: "close";
+  font-size: var(--qx-meta-size);
+}
+
+html.quiet-x [aria-modal="true"] [data-testid="app-bar-back"]::after {
+  content: "←";
+  font-size: 15px;
+}
+
+html.quiet-x [aria-modal="true"] [data-testid="app-bar-close"]:hover,
+html.quiet-x [aria-modal="true"] [data-testid="app-bar-back"]:hover {
+  color: var(--qx-fg) !important;
+}
+
+/* Menus (base in styles.css): radius, no shadow, lowercase items. */
+html.quiet-x [role="menu"],
+html.quiet-x [data-testid="Dropdown"] {
+  border-radius: var(--qx-radius) !important;
+  box-shadow: none !important;
+}
+
+html.quiet-x [role="menuitem"] {
+  text-transform: lowercase;
+}
+
+html.quiet-x [role="menuitem"] * {
+  color: inherit !important;
+}
+
+html.quiet-x [role="menuitem"] svg {
+  display: none !important;
+}
+
+html.quiet-x [role="menuitem"]:hover,
+html.quiet-x [role="menuitem"]:focus-visible {
+  background: transparent !important;
+  text-decoration: underline;
+}
+
+/* Tooltips and hover cards. */
+html.quiet-x [role="tooltip"] {
+  background: var(--qx-bg) !important;
+  color: var(--qx-fg) !important;
+  border: 1px solid var(--qx-hairline) !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+  font-family: var(--qx-font) !important;
+  font-size: 12px !important;
+}
+
+html.quiet-x [role="tooltip"] * {
+  background: transparent !important;
+  color: var(--qx-fg) !important;
+}
+
+html.quiet-x [data-testid="HoverCard"] {
+  background: var(--qx-bg) !important;
+  border: 1px solid var(--qx-hairline) !important;
+  border-radius: var(--qx-radius) !important;
+  box-shadow: none !important;
+}
+
+/* Floating chrome: DM drawer, Grok buttons. */
+html.quiet-x [data-testid="DMDrawer"],
+html.quiet-x [data-testid="GrokDrawer"],
+html.quiet-x [aria-label="Grok actions"],
+html.quiet-x button[aria-label="Grok"],
+html.quiet-x a[aria-label="Grok"]:not(nav a) {
+  display: none !important;
+}
+
+/* Premium / verified upsells. Hide the whole cell when one is inside. */
+html.quiet-x [data-testid="verified_profile_upsell"],
+html.quiet-x [data-testid^="super-upsell"],
+html.quiet-x aside[aria-label*="Premium"],
+html.quiet-x [aria-label="Subscribe to Premium"],
+html.quiet-x a[href="/i/premium_sign_up"]:not(nav a),
+html.quiet-x a[href^="/i/verified-choose"]:not(nav a),
+html.quiet-x [data-testid="cellInnerDiv"]:has(
+    a[href="/i/premium_sign_up"],
+    a[href^="/i/verified-choose"],
+    [data-testid="verified_profile_upsell"],
+    [data-testid^="super-upsell"]
+  ) {
+  display: none !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* Buttons: X's pills become lowercase text buttons                   */
+/* ------------------------------------------------------------------ */
+
+html.quiet-x :is(
+    [data-testid$="-follow"],
+    [data-testid$="-unfollow"],
+    [data-testid="confirmationSheetConfirm"],
+    [data-testid="confirmationSheetCancel"],
+    [data-testid="tweetButton"],
+    [data-testid="tweetButtonInline"],
+    [data-testid="editProfileButton"],
+    [data-testid="userActions"],
+    [data-testid="settingsSaveButton"],
+    [data-testid="empty_state_button_text"],
+    [data-testid="sheetDialog"] [role="button"]
+  ):not([data-quiet-x-ui]):not([data-quiet-x-ui] *) {
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  padding: 4px 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: var(--qx-fg) !important;
+  font-family: var(--qx-font) !important;
+  font-size: var(--qx-meta-size) !important;
+  font-weight: 500 !important;
+  text-transform: lowercase;
+  cursor: pointer;
+}
+
+html.quiet-x :is(
+    [data-testid$="-follow"],
+    [data-testid$="-unfollow"],
+    [data-testid="confirmationSheetConfirm"],
+    [data-testid="confirmationSheetCancel"],
+    [data-testid="tweetButton"],
+    [data-testid="tweetButtonInline"],
+    [data-testid="editProfileButton"],
+    [data-testid="userActions"],
+    [data-testid="settingsSaveButton"],
+    [data-testid="empty_state_button_text"],
+    [data-testid="sheetDialog"] [role="button"]
+  ):not([data-quiet-x-ui])
+  * {
+  background: transparent !important;
+  color: inherit !important;
+  font: inherit !important;
+}
+
+/* Secondary choices stay muted; destructive and state changes read as
+   words, not color. */
+html.quiet-x :is(
+    [data-testid$="-unfollow"],
+    [data-testid="confirmationSheetCancel"],
+    [data-testid="userActions"]
+  ):not([data-quiet-x-ui]) {
+  color: var(--qx-muted) !important;
+}
+
+html.quiet-x :is(
+    [data-testid$="-follow"],
+    [data-testid$="-unfollow"],
+    [data-testid="confirmationSheetConfirm"],
+    [data-testid="confirmationSheetCancel"],
+    [data-testid="tweetButton"],
+    [data-testid="tweetButtonInline"],
+    [data-testid="editProfileButton"],
+    [data-testid="userActions"],
+    [data-testid="settingsSaveButton"],
+    [data-testid="empty_state_button_text"],
+    [data-testid="sheetDialog"] [role="button"]
+  ):not([data-quiet-x-ui]):hover {
+  color: var(--qx-fg) !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+html.quiet-x :is(
+    [data-testid="tweetButton"],
+    [data-testid="tweetButtonInline"],
+    [data-testid="settingsSaveButton"]
+  )[aria-disabled="true"] {
+  color: var(--qx-faint) !important;
+  opacity: 1 !important;
+  text-decoration: none !important;
+  cursor: default;
+}
+
+/* The "more" icon button on profiles (userActions) shows a word. */
+html.quiet-x [data-testid="userActions"] svg {
+  display: none !important;
+}
+
+html.quiet-x [data-testid="userActions"]::after {
+  content: "···";
+  letter-spacing: 1px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Tabs                                                                */
+/* ------------------------------------------------------------------ */
+
+/* X draws the active tab with an empty div (blue bar) under the label.
+   It is the only childless div inside a tab, so :empty hides it without
+   touching the label wrapper (which always holds a span). The underline
+   from styles.css (box-shadow on [aria-selected="true"]) stays the only
+   rule. */
+html.quiet-x [role="tab"] div:empty {
+  display: none !important;
+}
+
+html.quiet-x [role="tab"] > div,
+html.quiet-x [role="tab"] > div > div {
+  background: transparent !important;
+  border: 0 !important;
+  min-width: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+html.quiet-x [role="tab"] span {
+  color: inherit !important;
+  font-weight: 400 !important;
+}
+
+html.quiet-x [role="tab"][aria-selected="true"] span {
+  font-weight: 500 !important;
+}
+
+html.quiet-x [role="tab"]:hover {
+  background: transparent !important;
+  color: var(--qx-fg) !important;
+}
+
+/* Scrollable tab rows (explore categories): no arrow buttons, no bar. */
+html.quiet-x [data-testid="ScrollSnap-SwipeableList"],
+html.quiet-x [data-testid="ScrollSnap-List"] {
+  scrollbar-width: none;
+}
+
+html.quiet-x [data-testid="ScrollSnap-prevButtonWrapper"],
+html.quiet-x [data-testid="ScrollSnap-nextButtonWrapper"] {
+  display: none !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* Explore + search                                                    */
+/* ------------------------------------------------------------------ */
+
+/* Search field: borderless, one bottom hairline, no magnifier. */
+html.quiet-x form[role="search"] {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  margin: 4px 0 8px !important;
+}
+
+html.quiet-x form[role="search"] label,
+html.quiet-x [data-testid="SearchBox_Search_Input_label"] {
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--qx-hairline) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+html.quiet-x form[role="search"] label:focus-within,
+html.quiet-x [data-testid="SearchBox_Search_Input_label"]:focus-within {
+  border-bottom-color: var(--qx-muted) !important;
+}
+
+html.quiet-x form[role="search"] label > div:first-child:has(svg),
+html.quiet-x form[role="search"] svg:not([data-testid="clearButton"] svg) {
+  display: none !important;
+}
+
+html.quiet-x [data-testid="SearchBox_Search_Input"] {
+  background: transparent !important;
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  padding-left: 0 !important;
+  color: var(--qx-fg) !important;
+  caret-color: var(--qx-fg);
+  font-family: var(--qx-font) !important;
+  font-size: var(--qx-body-size) !important;
+}
+
+html.quiet-x [data-testid="SearchBox_Search_Input"]::placeholder {
+  color: var(--qx-muted) !important;
+  text-transform: lowercase;
+  opacity: 1;
+}
+
+html.quiet-x [data-testid="clearButton"] {
+  background: transparent !important;
+  color: var(--qx-muted) !important;
+}
+
+html.quiet-x [data-testid="clearButton"] svg {
+  display: none !important;
+}
+
+html.quiet-x [data-testid="clearButton"]::after {
+  content: "clear";
+  font-size: var(--qx-meta-size);
+}
+
+/* Typeahead dropdown under the search field. */
+html.quiet-x form[role="search"] [role="listbox"],
+html.quiet-x [data-testid="typeaheadDropdownWrapped"] {
+  background: var(--qx-bg) !important;
+  border: 1px solid var(--qx-hairline) !important;
+  border-radius: var(--qx-radius) !important;
+  box-shadow: none !important;
+}
+
+html.quiet-x form[role="search"] [role="option"] {
+  background: transparent !important;
+}
+
+html.quiet-x form[role="search"] [role="option"]:hover,
+html.quiet-x form[role="search"] [role="option"][aria-selected="true"] {
+  background: transparent !important;
+  text-decoration: underline;
+}
+
+/* Trends as text rows: meta, name, count. */
+html.quiet-x [data-testid="trend"] {
+  position: relative;
+  padding: 14px 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+
+html.quiet-x [data-testid="trend"]:hover {
+  background: transparent !important;
+}
+
+html.quiet-x [data-testid="trend"] > div > div:first-child,
+html.quiet-x [data-testid="trend"] > div > div:first-child * {
+  color: var(--qx-muted) !important;
+  font-size: 12.5px !important;
+  font-weight: 400 !important;
+}
+
+html.quiet-x [data-testid="trend"] > div > div:nth-child(2),
+html.quiet-x [data-testid="trend"] > div > div:nth-child(2) * {
+  color: var(--qx-fg) !important;
+  font-size: var(--qx-body-size) !important;
+  font-weight: 500 !important;
+  line-height: 1.35 !important;
+}
+
+html.quiet-x [data-testid="trend"] > div > div:nth-child(n + 3),
+html.quiet-x [data-testid="trend"] > div > div:nth-child(n + 3) * {
+  color: var(--qx-muted) !important;
+  font-size: var(--qx-meta-size) !important;
+  font-weight: 400 !important;
+}
+
+html.quiet-x [data-testid="trend"] [data-testid="caret"] {
+  position: absolute !important;
+  top: 14px;
+  right: 0;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+  color: var(--qx-muted) !important;
+}
+
+html.quiet-x [data-testid="trend"] [data-testid="caret"] svg {
+  display: none !important;
+}
+
+html.quiet-x [data-testid="trend"] [data-testid="caret"]::after {
+  content: "···";
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+html.quiet-x [data-testid="trend"] img {
+  border-radius: var(--qx-radius) !important;
+}
+
+/* Explore hero and news cards: rounded media, white titles. */
+html.quiet-x [data-testid="eventHero"],
+html.quiet-x [data-testid="eventHero"] img,
+html.quiet-x [data-testid="news_sidebar"] img,
+html.quiet-x[data-qx-page="explore"] [data-testid="cellInnerDiv"] img:not([src*="profile_images"]):not([src*="emoji"]) {
+  border-radius: var(--qx-radius) !important;
+}
+
+html.quiet-x [data-testid="eventHero"] {
+  overflow: hidden !important;
+  margin: 8px 0 !important;
+  border: 0 !important;
+}
+
+html.quiet-x [data-testid="eventHero"] [dir] {
+  color: var(--qx-fg) !important;
+}
+
+/* People rows (who to follow, people results, followers lists). */
+html.quiet-x [data-testid="UserCell"] {
+  padding: 14px 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+
+html.quiet-x [data-testid="UserCell"]:hover {
+  background: transparent !important;
+}
+
+html.quiet-x [data-testid="UserCell"] [data-testid^="UserAvatar-Container"],
+html.quiet-x [data-testid="UserCell"] [data-testid^="UserAvatar-Container"] img {
+  width: var(--qx-avatar) !important;
+  height: var(--qx-avatar) !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+}
+
+html.quiet-x [data-testid="UserCell"] a[role="link"] [dir="ltr"] > span:only-child {
+  color: var(--qx-fg);
+}
+
+html.quiet-x [data-testid="UserCell"] [dir="auto"]:not(a [dir="auto"]) {
+  color: var(--qx-muted) !important;
+  font-size: var(--qx-meta-size) !important;
+}
+
+/* Generic avatars anywhere: circles. */
+html.quiet-x [data-testid^="UserAvatar-Container"],
+html.quiet-x [data-testid^="UserAvatar-Container"] img {
+  border-radius: 50% !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* Notifications                                                       */
+/* ------------------------------------------------------------------ */
+
+html.quiet-x article[data-testid="notification"] {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding-top: var(--qx-post-pad-y) !important;
+  padding-bottom: var(--qx-post-pad-y) !important;
+}
+
+/* Unread highlight: X tints the cell background. */
+html.quiet-x[data-qx-page="notifications"] [data-testid="cellInnerDiv"],
+html.quiet-x[data-qx-page="notifications"] [data-testid="cellInnerDiv"] > div,
+html.quiet-x article[data-testid="notification"] > div,
+html.quiet-x article[data-testid="notification"]:hover {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* The big colored icon column (heart, person, star, bell). It is a div
+   whose direct child is the svg and that holds no text, link or image. */
+html.quiet-x article[data-testid="notification"] div:has(> svg):not(:has(span, a, img, time)) {
+  display: none !important;
+}
+
+/* Tiny avatar row. */
+html.quiet-x article[data-testid="notification"] [data-testid^="UserAvatar-Container"],
+html.quiet-x article[data-testid="notification"] [data-testid^="UserAvatar-Container"] img {
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+}
+
+/* Text muted, names white. */
+html.quiet-x article[data-testid="notification"] [dir] {
+  color: var(--qx-muted) !important;
+  font-size: var(--qx-body-size) !important;
+}
+
+html.quiet-x article[data-testid="notification"] a[role="link"],
+html.quiet-x article[data-testid="notification"] a[role="link"] *,
+html.quiet-x article[data-testid="notification"] a[href^="/"]:not([href*="/status/"]) span,
+html.quiet-x article[data-testid="notification"] b,
+html.quiet-x article[data-testid="notification"] strong {
+  color: var(--qx-fg) !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+}
+
+/* The quoted post text in a notification (e.g. a like on your post). */
+html.quiet-x article[data-testid="notification"] [data-testid="tweetText"],
+html.quiet-x article[data-testid="notification"] [data-testid="tweetText"] * {
+  color: var(--qx-muted) !important;
+  font-weight: 400 !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* Master/detail layout: settings and chat                             */
+/* ------------------------------------------------------------------ */
+
+/* Widen the shell so nav + list + detail fit. */
+html.quiet-x:is([data-qx-page="settings"], [data-qx-page="chat"]) .qx-shell {
+  width: min(
+    100%,
+    calc(var(--qx-nav-width) + var(--qx-column-gap) + var(--qx-list-width) + var(--qx-column-gap) / 2 + var(--qx-feed-width))
+  ) !important;
+  max-width: calc(
+    var(--qx-nav-width) + var(--qx-column-gap) + var(--qx-list-width) + var(--qx-column-gap) / 2 + var(--qx-feed-width)
+  ) !important;
+}
+
+html.quiet-x:is([data-qx-page="settings"], [data-qx-page="chat"]) main[role="main"] {
+  width: auto !important;
+  max-width: calc(var(--qx-list-width) + var(--qx-column-gap) / 2 + var(--qx-feed-width)) !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+/* The row that holds the list column and the detail column. */
+html.quiet-x:is([data-qx-page="settings"], [data-qx-page="chat"]) main[role="main"] div:has(> [data-testid="primaryColumn"]) {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: flex-start !important;
+  gap: calc(var(--qx-column-gap) / 2) !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+html.quiet-x:is([data-qx-page="settings"], [data-qx-page="chat"]) [data-testid="primaryColumn"] {
+  flex: 0 0 var(--qx-list-width) !important;
+  width: var(--qx-list-width) !important;
+  max-width: var(--qx-list-width) !important;
+  min-width: 0 !important;
+}
+
+/* styles.css hides sidebarColumn everywhere. On settings and chat X can
+   render the detail pane in that column, so bring it back only when it
+   actually holds a detail pane (never trends). */
+html.quiet-x:is([data-qx-page="settings"], [data-qx-page="chat"])
+  [data-testid="sidebarColumn"]:has(
+    section[aria-label="Section details"],
+    section[aria-labelledby="detail-header"],
+    [data-testid="settingsDetailsContainer"],
+    [data-testid="DmActivityContainer"],
+    [data-testid="DMConversationBody"]
+  ) {
+  display: block !important;
+}
+
+/* Whatever column follows the list is the detail pane. */
+html.quiet-x:is([data-qx-page="settings"], [data-qx-page="chat"]) [data-testid="primaryColumn"] ~ div,
+html.quiet-x:is([data-qx-page="settings"], [data-qx-page="chat"]) section[aria-label="Section details"],
+html.quiet-x:is([data-qx-page="settings"], [data-qx-page="chat"]) section[aria-labelledby="detail-header"] {
+  flex: 1 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: var(--qx-feed-width) !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-sizing: border-box !important;
+}
+
+html.quiet-x:is([data-qx-page="settings"], [data-qx-page="chat"]) [data-testid="primaryColumn"] ~ div > div,
+html.quiet-x:is([data-qx-page="settings"], [data-qx-page="chat"]) [data-testid="sidebarColumn"] > div {
+  width: 100% !important;
+  max-width: none !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+/* Detail header: lowercase on settings only. */
+html.quiet-x[data-qx-page="settings"] section[aria-labelledby="detail-header"] h2,
+html.quiet-x[data-qx-page="settings"] #detail-header,
+html.quiet-x[data-qx-page="settings"] section[aria-label="Section details"] h2[role="heading"] {
+  color: var(--qx-fg) !important;
+  font-size: 17px !important;
+  font-weight: 600 !important;
+  text-transform: lowercase;
+}
+
+/* ------------------------------------------------------------------ */
+/* Settings                                                            */
+/* ------------------------------------------------------------------ */
+
+/* The settings list is a vertical tablist of links. styles.css lays every
+   tablist out as a horizontal row with a gap, so undo that here. */
+html.quiet-x[data-qx-page="settings"] [role="tablist"]:has(a[href^="/settings/"]) {
+  flex-direction: column !important;
+  gap: 0 !important;
+  margin: 8px 0 !important;
+}
+
+html.quiet-x[data-qx-page="settings"] a[href^="/settings/"] {
+  display: block !important;
+  padding: 12px 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: var(--qx-nav) !important;
+  text-decoration: none !important;
+}
+
+html.quiet-x[data-qx-page="settings"] [role="tablist"] a[href^="/settings/"],
+html.quiet-x[data-qx-page="settings"] [data-testid="primaryColumn"] a[href^="/settings/"] {
+  text-transform: lowercase;
+  font-size: var(--qx-nav-size) !important;
+}
+
+html.quiet-x[data-qx-page="settings"] a[href^="/settings/"] * {
+  background: transparent !important;
+  color: inherit !important;
+  font-family: var(--qx-font) !important;
+}
+
+/* Description line under a row title. */
+html.quiet-x[data-qx-page="settings"] a[href^="/settings/"] [dir] + [dir],
+html.quiet-x[data-qx-page="settings"] a[href^="/settings/"] div + div > [dir] {
+  color: var(--qx-muted) !important;
+  font-size: var(--qx-meta-size) !important;
+  margin-top: 2px;
+}
+
+html.quiet-x[data-qx-page="settings"] a[href^="/settings/"]:hover,
+html.quiet-x[data-qx-page="settings"] a[href^="/settings/"][aria-selected="true"],
+html.quiet-x[data-qx-page="settings"] a[href^="/settings/"][aria-current="page"] {
+  color: var(--qx-fg) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Chevrons and leading row icons. */
+html.quiet-x[data-qx-page="settings"] a[href^="/settings/"] svg,
+html.quiet-x[data-qx-page="settings"] [role="tab"] svg {
+  display: none !important;
+}
+
+/* Settings detail rows that are buttons, not links. */
+html.quiet-x[data-qx-page="settings"] [role="button"]:not([data-quiet-x-ui]):not([data-quiet-x-ui] *):has(svg + div, div + svg) {
+  background: transparent !important;
+}
+
+/* Form controls. */
+html.quiet-x[data-qx-page="settings"] input[type="checkbox"],
+html.quiet-x[data-qx-page="settings"] input[type="radio"],
+html.quiet-x [aria-modal="true"] input[type="checkbox"],
+html.quiet-x [aria-modal="true"] input[type="radio"] {
+  accent-color: var(--qx-fg);
+}
+
+html.quiet-x[data-qx-page="settings"] label:has(input:not([type="checkbox"]):not([type="radio"]), textarea, select),
+html.quiet-x [aria-modal="true"] label:has(input:not([type="checkbox"]):not([type="radio"]), textarea, select) {
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--qx-hairline) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+html.quiet-x[data-qx-page="settings"] label:has(input, textarea, select):focus-within,
+html.quiet-x [aria-modal="true"] label:has(input, textarea, select):focus-within {
+  border-bottom-color: var(--qx-muted) !important;
+}
+
+html.quiet-x[data-qx-page="settings"] :is(input:not([type="checkbox"]):not([type="radio"]), textarea, select),
+html.quiet-x [aria-modal="true"] :is(input:not([type="checkbox"]):not([type="radio"]), textarea, select) {
+  background: transparent !important;
+  border: 0 !important;
+  outline: none !important;
+  color: var(--qx-fg) !important;
+  caret-color: var(--qx-fg);
+  font-family: var(--qx-font) !important;
+  font-size: var(--qx-body-size) !important;
+  accent-color: var(--qx-fg);
+}
+
+html.quiet-x[data-qx-page="settings"] select option,
+html.quiet-x [aria-modal="true"] select option {
+  background: var(--qx-bg);
+  color: var(--qx-fg);
+}
+
+/* Field label text (the floating "Name", "Email"). User values are the
+   input itself, so lowercasing the label span is safe. */
+html.quiet-x[data-qx-page="settings"] label > div:first-child span,
+html.quiet-x [aria-modal="true"] label > div:first-child span {
+  color: var(--qx-muted) !important;
+  text-transform: lowercase;
+}
+
+html.quiet-x[data-qx-page="settings"] label:has(select) svg {
+  display: none !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* Chat (/messages and /i/chat)                                        */
+/* ------------------------------------------------------------------ */
+
+/* List title only ("Messages"). The conversation header holds a name. */
+html.quiet-x[data-qx-page="chat"] [data-testid="primaryColumn"] > div > div:first-child h2[role="heading"],
+html.quiet-x[data-qx-page="chat"] section[aria-label="Section navigation"] h2[role="heading"] {
+  text-transform: lowercase;
+}
+
+html.quiet-x[data-qx-page="chat"] [data-testid="primaryColumn"] > div > div:first-child svg,
+html.quiet-x[data-qx-page="chat"] [data-testid="primaryColumn"] > div > div:first-child [role="button"] {
+  display: none !important;
+}
+
+/* Conversation list rows. */
+html.quiet-x [data-testid="conversation"] {
+  padding: 14px 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+html.quiet-x [data-testid="conversation"]:hover,
+html.quiet-x [data-testid="conversation"][aria-selected="true"],
+html.quiet-x [data-testid="conversation"] > div,
+html.quiet-x [data-testid="cellInnerDiv"]:has([data-testid="conversation"]) > div {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+html.quiet-x [data-testid="conversation"] [data-testid^="UserAvatar-Container"],
+html.quiet-x [data-testid="conversation"] [data-testid^="UserAvatar-Container"] img {
+  width: var(--qx-avatar) !important;
+  height: var(--qx-avatar) !important;
+  border-radius: 50% !important;
+}
+
+/* Preview line and time muted; the name keeps X's first-line weight. */
+html.quiet-x [data-testid="conversation"] [data-testid="tweetText"],
+html.quiet-x [data-testid="conversation"] time,
+html.quiet-x [data-testid="conversation"] [dir="ltr"] > span:not(:first-child) {
+  color: var(--qx-muted) !important;
+  font-size: var(--qx-meta-size) !important;
+}
+
+html.quiet-x [data-testid="conversation"] [data-testid="caret"],
+html.quiet-x [data-testid="conversation"] svg:not([data-testid="icon-verified"]) {
+  display: none !important;
+}
+
+/* Panes. */
+html.quiet-x [data-testid="DmActivityContainer"],
+html.quiet-x [data-testid="DmScrollerContainer"],
+html.quiet-x [data-testid="DMConversationBody"],
+html.quiet-x [data-testid="DmActivityViewport"] {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Messages: no bubbles. Text sits on the ground, X keeps alignment
+   (sent right, received left). */
+html.quiet-x [data-testid="messageEntry"] {
+  padding: 6px 0 !important;
+  background: transparent !important;
+}
+
+html.quiet-x [data-testid="messageEntry"] div:not([data-testid="tweetPhoto"]):not([data-testid="videoPlayer"]):not([data-testid="card.wrapper"]) {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+html.quiet-x [data-testid="messageEntry"] [role="presentation"],
+html.quiet-x [data-testid="messageEntry"] [data-testid="tweetText"] {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  border-radius: 0 !important;
+}
+
+html.quiet-x [data-testid="messageEntry"] [data-testid="tweetText"],
+html.quiet-x [data-testid="messageEntry"] [data-testid="tweetText"] * {
+  margin: 0 !important;
+  color: var(--qx-fg) !important;
+  font-size: var(--qx-body-size) !important;
+  line-height: 1.5 !important;
+}
+
+html.quiet-x [data-testid="messageEntry"] img:not([src*="profile_images"]):not([src*="emoji"]),
+html.quiet-x [data-testid="messageEntry"] [data-testid="tweetPhoto"],
+html.quiet-x [data-testid="messageEntry"] [data-testid="videoPlayer"],
+html.quiet-x [data-testid="messageEntry"] [data-testid="card.wrapper"] {
+  border-radius: var(--qx-radius) !important;
+  overflow: hidden !important;
+}
+
+html.quiet-x [data-testid="messageEntry"] [data-testid^="UserAvatar-Container"],
+html.quiet-x [data-testid="messageEntry"] [data-testid^="UserAvatar-Container"] img {
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 50% !important;
+}
+
+html.quiet-x [data-testid="messageEntry"] time,
+html.quiet-x [data-testid="messageEntry"] [data-testid="messageMetadata"],
+html.quiet-x [data-testid="DmScrollerContainer"] time {
+  color: var(--qx-muted) !important;
+  font-size: 12px !important;
+}
+
+/* Optional JS hooks: if content.js marks entries, these win over X's
+   alignment. */
+html.quiet-x [data-qx-dm="sent"] {
+  text-align: right !important;
+  align-self: flex-end !important;
+  justify-content: flex-end !important;
+}
+
+html.quiet-x [data-qx-dm="received"] {
+  text-align: left !important;
+  align-self: flex-start !important;
+  justify-content: flex-start !important;
+}
+
+html.quiet-x [data-qx-dm="received"] [data-testid="tweetText"],
+html.quiet-x [data-qx-dm="received"] [data-testid="tweetText"] * {
+  color: var(--qx-nav) !important;
+}
+
+/* Message reaction / more buttons that float beside a message. */
+html.quiet-x [data-testid="messageEntry"] [aria-label="Actions"],
+html.quiet-x [data-testid="messageEntry"] [aria-label="React"],
+html.quiet-x [data-testid="messageEntry"] [aria-label="Reply"] {
+  opacity: 0.7;
+}
+
+html.quiet-x [data-testid="messageEntry"] [role="button"] svg {
+  color: var(--qx-muted) !important;
+}
+
+/* Composer: a borderless line like the reply box. */
+html.quiet-x aside:has([data-testid="dmComposerTextInput"]),
+html.quiet-x aside:has([data-testid="dmComposerTextInput"]) > div,
+html.quiet-x [data-testid="DmComposer-Editor"] {
+  background: var(--qx-bg) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+html.quiet-x aside:has([data-testid="dmComposerTextInput"]) div:has(> div > [data-testid="dmComposerTextInput"]),
+html.quiet-x aside:has([data-testid="dmComposerTextInput"]) div:has(> [data-testid="dmComposerTextInput"]) {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+html.quiet-x [data-testid="dmComposerTextInput"] {
+  background: transparent !important;
+  border: 0 !important;
+  outline: none !important;
+  color: var(--qx-fg) !important;
+  caret-color: var(--qx-fg);
+  font-family: var(--qx-font) !important;
+  font-size: var(--qx-body-size) !important;
+}
+
+html.quiet-x [data-testid="dmComposerTextInput"] [data-text="true"],
+html.quiet-x [data-testid="dmComposerTextInput"] span {
+  color: var(--qx-fg) !important;
+}
+
+html.quiet-x aside:has([data-testid="dmComposerTextInput"]) .public-DraftEditorPlaceholder-inner,
+html.quiet-x aside:has([data-testid="dmComposerTextInput"]) [id^="placeholder-"] {
+  color: var(--qx-muted) !important;
+  text-transform: lowercase;
+}
+
+/* Toolbar icons: hidden, nodes kept. */
+html.quiet-x aside:has([data-testid="dmComposerTextInput"]) [aria-label="Add photos or video"],
+html.quiet-x aside:has([data-testid="dmComposerTextInput"]) [aria-label="Add a GIF"],
+html.quiet-x aside:has([data-testid="dmComposerTextInput"]) [aria-label="Add emoji"],
+html.quiet-x aside:has([data-testid="dmComposerTextInput"]) [aria-label="Add a voice message"],
+html.quiet-x aside:has([data-testid="dmComposerTextInput"]) [data-testid="gifSearchButton"],
+html.quiet-x aside:has([data-testid="dmComposerTextInput"]) [data-testid="dmComposerAttachmentButton"] {
+  display: none !important;
+}
+
+/* Send: a muted word. */
+html.quiet-x [data-testid="dmComposerSendButton"] {
+  width: auto !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 4px 0 4px 12px !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: var(--qx-muted) !important;
+  cursor: pointer;
+}
+
+html.quiet-x [data-testid="dmComposerSendButton"] svg {
+  display: none !important;
+}
+
+html.quiet-x [data-testid="dmComposerSendButton"]::after {
+  content: "send";
+  font-family: var(--qx-font);
+  font-size: var(--qx-body-size);
+}
+
+html.quiet-x [data-testid="dmComposerSendButton"]:hover:not([aria-disabled="true"]) {
+  color: var(--qx-fg) !important;
+  text-decoration: underline;
+}
+
+html.quiet-x [data-testid="dmComposerSendButton"][aria-disabled="true"] {
+  color: var(--qx-faint) !important;
+  opacity: 1 !important;
+  cursor: default;
+}
+
+/* /i/chat (XChat). Its testids are newer and less known, so these lean
+   on role and aria hooks. All guesses; verify on a live page. */
+html.quiet-x[data-qx-page="chat"] [data-testid^="dm-"] {
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+html.quiet-x[data-qx-page="chat"] :is(textarea, [contenteditable="true"][role="textbox"], input[aria-label*="message" i], textarea[aria-label*="message" i]) {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  color: var(--qx-fg) !important;
+  caret-color: var(--qx-fg);
+  font-family: var(--qx-font) !important;
+  font-size: var(--qx-body-size) !important;
+}
+
+html.quiet-x[data-qx-page="chat"] :is(textarea, input)::placeholder {
+  color: var(--qx-muted) !important;
+  text-transform: lowercase;
+  opacity: 1;
+}
+
+html.quiet-x[data-qx-page="chat"] [role="listitem"],
+html.quiet-x[data-qx-page="chat"] [role="option"] {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+html.quiet-x[data-qx-page="chat"] [role="listitem"] img[src*="profile_images"],
+html.quiet-x[data-qx-page="chat"] [role="option"] img[src*="profile_images"] {
+  border-radius: 50% !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* Bookmarks, lists, communities                                       */
+/* ------------------------------------------------------------------ */
+
+/* Header treatment is generic (see chrome). These pages add list cells
+   and banners. */
+html.quiet-x:is([data-qx-page="bookmarks"], [data-qx-page="lists"]) [data-testid="cellInnerDiv"] img:not([src*="profile_images"]):not([src*="emoji"]) {
+  border-radius: var(--qx-radius) !important;
+}
+
+html.quiet-x [data-testid="listCell"],
+html.quiet-x [data-testid="communityCell"] {
+  padding: 14px 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+
+html.quiet-x [data-testid="listCell"]:hover,
+html.quiet-x [data-testid="communityCell"]:hover {
+  background: transparent !important;
+}
+
+/* List and community banners on their detail pages. */
+html.quiet-x a[href$="/photo"] img:not([src*="profile_images"]),
+html.quiet-x [data-testid="communityHeaderImage"],
+html.quiet-x [data-testid="listBanner"] {
+  border-radius: var(--qx-radius) !important;
+}
+
+/* Empty states ("Save posts for later"). */
+html.quiet-x [data-testid="emptyState"] {
+  padding: var(--qx-post-pad-y) 0 !important;
+}
+
+html.quiet-x [data-testid="emptyState"] h2,
+html.quiet-x [data-testid="emptyState"] [role="heading"] {
+  color: var(--qx-fg) !important;
+  font-size: 17px !important;
+  font-weight: 600 !important;
+  text-transform: lowercase;
+}
+
+html.quiet-x [data-testid="emptyState"] [dir]:not([role="heading"]):not(h2) {
+  color: var(--qx-muted) !important;
+  font-size: var(--qx-meta-size) !important;
+}
+
+html.quiet-x [data-testid="emptyState"] img,
+html.quiet-x [data-testid="emptyState"] svg {
+  display: none !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* Narrow screens                                                      */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 860px) {
+  html.quiet-x:is([data-qx-page="settings"], [data-qx-page="chat"]) .qx-shell {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  html.quiet-x:is([data-qx-page="settings"], [data-qx-page="chat"]) main[role="main"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+  }
+
+  html.quiet-x:is([data-qx-page="settings"], [data-qx-page="chat"]) main[role="main"] div:has(> [data-testid="primaryColumn"]) {
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+
+  html.quiet-x:is([data-qx-page="settings"], [data-qx-page="chat"]) [data-testid="primaryColumn"],
+  html.quiet-x:is([data-qx-page="settings"], [data-qx-page="chat"]) [data-testid="primaryColumn"] ~ div,
+  html.quiet-x:is([data-qx-page="settings"], [data-qx-page="chat"]) section[aria-label="Section details"],
+  html.quiet-x:is([data-qx-page="settings"], [data-qx-page="chat"]) section[aria-labelledby="detail-header"] {
+    flex: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  html.quiet-x [role="tablist"] {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    gap: 20px !important;
+    scrollbar-width: none;
+  }
+
+  html.quiet-x[data-qx-page="settings"] [role="tablist"]:has(a[href^="/settings/"]) {
+    overflow-x: visible !important;
+  }
+
+  html.quiet-x [role="tab"] {
+    flex: 0 0 auto !important;
+    white-space: nowrap;
+  }
+
+  html.quiet-x [aria-modal="true"],
+  html.quiet-x [data-testid="sheetDialog"] {
+    max-width: calc(100vw - 32px) !important;
+    box-sizing: border-box !important;
+  }
+
+  html.quiet-x [data-testid="trend"],
+  html.quiet-x [data-testid="UserCell"],
+  html.quiet-x [data-testid="conversation"] {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
