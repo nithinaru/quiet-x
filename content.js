@@ -602,6 +602,59 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
     else article.append(node);
   }
 
+  function buildTools(article) {
+    const scope = article.closest('[data-testid="primaryColumn"]') || article;
+    const sort = scope.querySelector('[data-testid="replySort"]');
+    const quotes = scope.querySelector('a[href*="/quotes"]');
+    if (!sort && !quotes) return null;
+    const tools = document.createElement("div");
+    tools.className = "qx-tools";
+    tools.setAttribute(UI, "");
+    if (sort) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "qx-tool";
+      button.setAttribute(UI, "");
+      button.textContent = sortLabel(sort.textContent || "");
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        (scope.querySelector('[data-testid="replySort"]') || sort).click();
+      });
+      tools.append(button);
+      sort.classList.add("qx-clip");
+    }
+    if (sort && quotes) {
+      const sep = document.createElement("span");
+      sep.className = "qx-sep";
+      sep.setAttribute(UI, "");
+      sep.textContent = " · ";
+      tools.append(sep);
+    }
+    if (quotes) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "qx-tool";
+      button.setAttribute(UI, "");
+      button.textContent = "view quotes";
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        quotes.click();
+      });
+      tools.append(button);
+      quotes.classList.add("qx-clip");
+    }
+    return tools;
+  }
+
+  function sortLabel(raw) {
+    const text = raw.toLowerCase();
+    if (text.includes("recent")) return "sort recent ⌄";
+    if (text.includes("like")) return "sort likes ⌄";
+    return "sort relevant ⌄";
+  }
+
   function ensureBack() {
     const primary = document.querySelector('[data-testid="primaryColumn"]');
     if (!primary || primary.querySelector(":scope > .qx-back")) return;

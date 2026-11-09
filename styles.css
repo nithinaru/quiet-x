@@ -439,6 +439,10 @@ html.quiet-x .qx-action.is-on:hover {
   color: var(--qx-fg);
 }
 
+html.quiet-x .qx-tools {
+  margin-left: auto;
+}
+
 html.quiet-x [data-testid="showReplies"] {
   background: transparent !important;
   border: 0 !important;
