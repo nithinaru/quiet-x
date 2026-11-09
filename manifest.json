@@ -3,7 +3,18 @@
   "name": "quiet-x",
   "version": "0.1.0",
   "description": "Restyle X into a minimal, text-only, black-and-white reading view.",
-  "permissions": ["storage"],
+  "permissions": ["storage", "webNavigation"],
+  "host_permissions": [
+    "https://x.com/*",
+    "https://twitter.com/*",
+    "https://mobile.x.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "quiet-x"
+  },
   "options_ui": {
     "page": "options.html",
     "open_in_tab": true
