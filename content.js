@@ -56,6 +56,11 @@
 
 function start() {
   document.documentElement.classList.add("quiet-x");
+    if (!routePoll) {
+      routePoll = window.setInterval(() => {
+        if (running && location.pathname !== currentPath) scan();
+      }, 800);
+    }
     if (!observer) {
       observer = new MutationObserver(() => scheduleScan());
       observer.observe(document.documentElement, { childList: true, subtree: true });
@@ -100,14 +105,32 @@ document.querySelectorAll("[data-qx]").forEach((node) => node.removeAttribute("d
   function scan() {
     if (!running) return;
     try {
+      const routeChanged = location.pathname !== currentPath;
+      if (routeChanged) {
+        currentPath = location.pathname;
+        document.documentElement.dataset.qxStatus = isStatusRoute() ? "1" : "0";
+        window.clearInterval(toneTimer);
+        toneTimer = 0;
+        document.querySelectorAll(`[${UI}]`).forEach((node) => node.remove());
+        document.querySelectorAll("article[data-testid='tweet']").forEach((article) => {
+          article.removeAttribute("data-qx");
+        });
+      }
       centerShell();
       renderNav();
       refreshCounts();
       updateNavActive();
       hideHomeComposer();
+      if (document.readyState !== "loading") {
+        document.documentElement.dataset.qxReady = "1";
+      }
     } catch (error) {
       console.error("quiet-x", error);
     }
+  }
+
+  function isStatusRoute() {
+    return /\/status\/\d+/.test(location.pathname);
   }
 
   function centerShell() {
