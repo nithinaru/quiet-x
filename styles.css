@@ -40,3 +40,131 @@ html.quiet-x ::selection {
   background: #fff;
   color: #000;
 }
+
+html.quiet-x .qx-clip {
+  display: none !important;
+}
+
+html.quiet-x #react-root,
+html.quiet-x #react-root > div,
+html.quiet-x main[role="main"],
+html.quiet-x header[role="banner"],
+html.quiet-x [data-testid="primaryColumn"],
+html.quiet-x [data-testid="cellInnerDiv"] {
+  background-color: var(--qx-bg) !important;
+  background-image: none !important;
+  border-color: transparent !important;
+}
+
+html.quiet-x .qx-shell {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  gap: var(--qx-column-gap) !important;
+  width: min(100%, calc(var(--qx-nav-width) + var(--qx-column-gap) + var(--qx-feed-width))) !important;
+  max-width: calc(var(--qx-nav-width) + var(--qx-column-gap) + var(--qx-feed-width)) !important;
+  margin: 0 auto !important;
+  min-height: 100vh !important;
+  background: var(--qx-bg) !important;
+  box-sizing: border-box !important;
+}
+
+html.quiet-x header[role="banner"] {
+  position: sticky !important;
+  top: 0 !important;
+  height: 100vh !important;
+  width: var(--qx-nav-width) !important;
+  min-width: var(--qx-nav-width) !important;
+  max-width: var(--qx-nav-width) !important;
+  flex: 0 0 var(--qx-nav-width) !important;
+  box-sizing: border-box !important;
+  padding: 18px 8px 24px 4px !important;
+  margin: 0 !important;
+  overflow: auto !important;
+  border: 0 !important;
+  z-index: 2;
+}
+
+html.quiet-x main[role="main"] {
+  display: block !important;
+  width: var(--qx-feed-width) !important;
+  max-width: var(--qx-feed-width) !important;
+  flex: 0 0 var(--qx-feed-width) !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+html.quiet-x [data-testid="primaryColumn"] {
+  width: 100% !important;
+  max-width: var(--qx-feed-width) !important;
+  margin: 0 !important;
+  border: 0 !important;
+  box-sizing: border-box !important;
+  padding-top: 8px !important;
+}
+
+html.quiet-x [data-testid="sidebarColumn"],
+html.quiet-x aside[aria-label="Trending"],
+html.quiet-x [data-testid="GrokDrawer"] {
+  display: none !important;
+}
+
+html.quiet-x a[aria-label="X"],
+html.quiet-x a[aria-label="Twitter"],
+html.quiet-x [data-testid="SideNav_AccountSwitcher_Button"],
+html.quiet-x [data-testid="profileBanner"],
+html.quiet-x a[href$="/header_photo"] {
+  display: none !important;
+}
+
+@media (max-width: 860px) {
+  html.quiet-x .qx-shell {
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: 0 !important;
+  }
+
+  html.quiet-x header[role="banner"] {
+    position: sticky !important;
+    height: auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    flex: none !important;
+    padding: 12px 16px !important;
+  }
+
+  html.quiet-x .qx-navlist {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+  }
+
+  html.quiet-x .qx-nav-item {
+    width: auto;
+  }
+
+  html.quiet-x .qx-nav-divider {
+    display: none;
+  }
+
+  html.quiet-x main[role="main"],
+  html.quiet-x [data-testid="primaryColumn"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 16px !important;
+    box-sizing: border-box !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.quiet-x *,
+  html.quiet-x *::before,
+  html.quiet-x *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
